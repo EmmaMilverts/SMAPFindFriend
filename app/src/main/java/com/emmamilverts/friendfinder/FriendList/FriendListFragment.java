@@ -1,6 +1,11 @@
 package com.emmamilverts.friendfinder.FriendList;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -11,15 +16,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
+import com.emmamilverts.friendfinder.LocationService;
+import com.emmamilverts.friendfinder.MainActivity;
 import com.emmamilverts.friendfinder.R;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FriendListFragment extends Fragment {
-    List<FriendDTO> friends;
 
+    List<FriendDTO> friends;
+    LocationService mService;
     public FriendListFragment() {
         friends = new FriendDTO().preFillFriendList();
     }
@@ -28,7 +38,7 @@ public class FriendListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_friend_list,container,false);
         RecyclerView recyclerView = view.findViewById(R.id.friendRecycleView);
-        FriendListAdapter listAdapter = new FriendListAdapter(friends, getContext());
+        FriendListAdapter listAdapter = new FriendListAdapter(friends, getContext(), this);
         recyclerView.setAdapter(listAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         FloatingActionButton add_Button = view.findViewById(R.id.add_FAB);
@@ -53,5 +63,23 @@ public class FriendListFragment extends Fragment {
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Objects.requireNonNull(getActivity()).registerReceiver(new LocationReciever(), new IntentFilter(LocationService.RESULT_LOCATION_OBJECT));
+    }
+    public LocationService getLocationService(){
+        MainActivity main = (MainActivity) getActivity();
+        return mService = main.getLocationService();
+    }
+    private class LocationReciever extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            Location locationObject = arg1.getParcelableExtra(LocationService.RESULT_LOCATION_OBJECT);
+            // TODO: 13-05-2019 Call Firebaseservice and send Location to user 
+            Toast.makeText(getActivity(), "Location object fetched", Toast.LENGTH_LONG).show();
+        }
     }
 }
