@@ -2,5 +2,10 @@
     <string name="app_name">FriendFinder</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
+    <string name="image">Image</string>
+    <string name="email_id">emailId</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="create_a_new_account">CreateNewAccount</string>
     <string name="title_notifications">Notifications</string>
 </resources>
