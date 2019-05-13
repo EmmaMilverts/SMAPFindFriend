@@ -1,48 +1,39 @@
 package com.emmamilverts.friendfinder;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
+import com.emmamilverts.friendfinder.FriendList.FriendListFragment;
+import com.emmamilverts.friendfinder.FriendRequestList.FriendRequestListFragment;
+import com.emmamilverts.friendfinder.HistoryList.HistoryListFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
-    private FirebaseAuth mAuth;
-    FirebaseAuth.AuthStateListener mAuthListner;
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListner);
-    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
+        Fragment fragment = null;
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    return true;
+                    fragment = new FriendListFragment();
+                    break;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
+                    fragment = new HistoryListFragment();
+                    break;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    return true;
+                    fragment = new FriendRequestListFragment();
+                    break;
             }
-            return false;
+            return loadFragment(fragment);
         }
     };
 
@@ -50,31 +41,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FirebaseApp.initializeApp(getApplicationContext());
-
-        Button button = findViewById(R.id.signout);
-        mAuth = FirebaseAuth.getInstance();
-
-        mAuthListner = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null)
-                {
-                    startActivity(new Intent(MainActivity.this, SignInActivity.class));
-                }
-            }
-        };
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAuth.signOut();
-            }
-        });
-
-        mTextMessage = (TextView) findViewById(R.id.message);
+        loadFragment(new FriendListFragment());
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
-
+    private boolean loadFragment(Fragment fragment) {
+        //switching fragment
+        if (fragment != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .replace(R.id.frameLayout, fragment)
+                    .commit();
+            return true;
+        }
+        return false;
+    }
 }
