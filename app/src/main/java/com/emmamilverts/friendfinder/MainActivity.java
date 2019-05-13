@@ -1,14 +1,12 @@
 package com.emmamilverts.friendfinder;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -16,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.emmamilverts.friendfinder.FriendList.FriendListFragment;
 import com.emmamilverts.friendfinder.FriendRequestList.FriendRequestListFragment;
@@ -28,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
     private boolean mBound = false;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+        startService(new Intent(this,LocationService.class));
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         Intent serviceIntent = new Intent(this, LocationService.class);
@@ -36,7 +39,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(mConnection);
+        if (mBound){
+            unbindService(mConnection);
+            mBound = false;
+        }
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -94,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
     }
     @Nullable
     public LocationService getLocationService(){
-        return mService;
+        if(mBound)
+            return mService;
+        else
+            return null;
     }
 }

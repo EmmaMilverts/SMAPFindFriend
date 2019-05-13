@@ -1,5 +1,6 @@
 package com.emmamilverts.friendfinder.FriendList;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,12 +29,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class FriendListFragment extends Fragment {
-
+    private static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 1000;
     List<FriendDTO> friends;
     LocationService mService;
     public FriendListFragment() {
         friends = new FriendDTO().preFillFriendList();
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -68,18 +71,30 @@ public class FriendListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Objects.requireNonNull(getActivity()).registerReceiver(new LocationReciever(), new IntentFilter(LocationService.RESULT_LOCATION_OBJECT));
+        Objects.requireNonNull(getActivity()).registerReceiver(new LocationReciever(), new IntentFilter(LocationService.ACTION_GET_LOCATION));
+        Objects.requireNonNull(getActivity()).registerReceiver(new PermissionReceiver(),new IntentFilter(LocationService.ACTION_REQUEST_LOCATION_PERMISSION));
     }
     public LocationService getLocationService(){
         MainActivity main = (MainActivity) getActivity();
-        return mService = main.getLocationService();
+        return mService = Objects.requireNonNull(main).getLocationService();
     }
     private class LocationReciever extends BroadcastReceiver {
         @Override
         public void onReceive(Context arg0, Intent arg1) {
-            Location locationObject = arg1.getParcelableExtra(LocationService.RESULT_LOCATION_OBJECT);
-            // TODO: 13-05-2019 Call Firebaseservice and send Location to user 
-            Toast.makeText(getActivity(), "Location object fetched", Toast.LENGTH_LONG).show();
+                Location locationObject = arg1.getParcelableExtra(LocationService.RESULT_LOCATION_OBJECT);
+                // TODO: 13-05-2019 Call Firebaseservice and send Location to user
+                Toast.makeText(getActivity(), "Location object fetched", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private class PermissionReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Requests permission if not granted already
+            ActivityCompat.requestPermissions(Objects.requireNonNull(getActivity()),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_READ_LOCATION);
+            Toast.makeText(context, "Requesting permissions", Toast.LENGTH_SHORT).show();
         }
     }
 }
