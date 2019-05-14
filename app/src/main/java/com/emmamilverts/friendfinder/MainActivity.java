@@ -21,7 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -110,7 +112,12 @@ public class MainActivity extends AppCompatActivity {
         Friends.add(Friend2);
         User user = new User(id, Name, Friends);
 
+        String message = "TestMessage";
+        Map<String, Object> notificationMessage = new HashMap<>();
+        notificationMessage.put("message", message);
+
         databaseUsers.child(id).setValue(user);
+        //databaseUsers.child(id + "/Notification").setValue(notificationMessage);
         Toast.makeText(this, "User added", Toast.LENGTH_SHORT).show();
     }
 }
