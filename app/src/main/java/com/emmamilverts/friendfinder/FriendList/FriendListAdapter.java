@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
+import com.emmamilverts.friendfinder.LocationService;
 import com.emmamilverts.friendfinder.R;
 
 import java.util.List;
@@ -18,9 +19,11 @@ import java.util.List;
 public class FriendListAdapter extends RecyclerView.Adapter {
     private List<FriendDTO> friendDTOList;
     private Context context;
-    public FriendListAdapter(List<FriendDTO> friendDTOList, Context context){
+    private FriendListFragment fragment;
+    public FriendListAdapter(List<FriendDTO> friendDTOList, Context context, FriendListFragment fragment){
         this.friendDTOList = friendDTOList;
         this.context = context;
+        this.fragment = fragment;
     }
     @NonNull
     @Override
@@ -52,10 +55,13 @@ public class FriendListAdapter extends RecyclerView.Adapter {
 
             send_Button.setOnClickListener(v -> {
                 // TODO: 09-05-2019 Should be able to send location to selected user
+               LocationService mService = fragment.getLocationService();
+               mService.getLocation();
             });
 
             request_Button.setOnClickListener(v -> {
                 // TODO: 09-05-2019 Should be able to request location from selected user
+                LocationService mService = fragment.getLocationService();
             });
         }
 
