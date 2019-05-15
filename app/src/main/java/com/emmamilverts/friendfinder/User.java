@@ -1,50 +1,49 @@
 package com.emmamilverts.friendfinder;
 
+import com.emmamilverts.friendfinder.DTO.FriendDTO;
+
 import java.util.List;
 
 public class User {
-    String userId;
-    String userName;
-    List<User> friends;
+    String username;
+    List<FriendDTO> friends;
+    String email;
 
     public User()
     {
 
     }
 
-    public User(String userId, String userName, List<User>friends)
+    public User(String userName, List<FriendDTO>friends, String email)
     {
-        this.userId = userId;
-        this.userName = userName;
+        this.username = userName;
         this.friends = friends;
+        this.email = email;
     }
 
-    public User(String userId, String userName)
+    public User(String userName, String email)
     {
-        this.userId = userId;
-        this.userName = userName;
+        this.username = userName;
+        this.email = email;
     }
 
-    public String getUserId()
+    public String getUsername()
     {
-        return userId;
+        return username;
     }
 
-    public String getUserName()
-    {
-        return userName;
-    }
-
-    public List<User> getFriends() {return friends;}
+    public List<FriendDTO> getFriends() {return friends;}
 
     public String setUserName(String userName)
     {
         return userName;
     }
 
-    public List<User> serFriends(List<User> friends)
+    public List<User> setFriends(List<User> friends)
     {
         return friends;
     }
+
+    public String getEmail() {return email;}
 }
 

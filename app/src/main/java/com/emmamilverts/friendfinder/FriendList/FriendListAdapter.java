@@ -3,20 +3,30 @@ package com.emmamilverts.friendfinder.FriendList;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
+import com.emmamilverts.friendfinder.MySingleton;
 import com.emmamilverts.friendfinder.R;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +37,10 @@ public class FriendListAdapter extends RecyclerView.Adapter {
     FirebaseAuth mAuth;
     private String mCurrentId;
     DatabaseReference databaseUsers;
+    final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
+    final private String SERVER_KEY = "key=AIzaSyAVtluMmMAF6EheSqzVwiT2aklJffkKeG0";
+    final private String CONTENT_TYPE = "application/json";
+    final String TAG = "NOTIFICATION_TAG";
 
 
     private List<FriendDTO> friendDTOList;
@@ -69,13 +83,26 @@ public class FriendListAdapter extends RecyclerView.Adapter {
 
 
             send_Button.setOnClickListener(v -> {
-
-                /*final String userId = mAuth.getUid(); //User id for Mads
-                databaseUsers.child("Users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                databaseUsers.child(mAuth.getUid()).child("username").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
-                        String myUserId = user.getUserId();
+                        String TOPIC = "/Notification/"+ mAuth.getUid();
+                        String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + "has sent you a location";
+                        String NOTIFICATION_TITLE = "New location has arrived!";
+                        JSONObject notification = new JSONObject();
+                        JSONObject notificationBody = new JSONObject();
+                        try {
+                            notificationBody.put("title", NOTIFICATION_TITLE);
+                            notificationBody.put("message", NOTIFICATION_MESSAGE);
+
+                            notification.put("to", TOPIC);
+                            notification.put("data", notificationBody);
+
+                            sendNotification(notification);
+                        }
+                        catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
@@ -83,75 +110,8 @@ public class FriendListAdapter extends RecyclerView.Adapter {
 
                     }
                 });
-                */
 
 
-
-                String message = "NotificationTestMessage";
-                String userId = "-LepttPmmqeQqdnzK_dP";
-                if (message != null) {
-                    Map<String, Object> notificationMessage = new HashMap<>();
-                    notificationMessage.put("message", message);
-                    notificationMessage.put("from", mCurrentId);
-
-                    databaseUsers.child(userId + "/Notification").setValue(notificationMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("SS", "Notification sent");
-                        }
-                    });
-                }
-
-/*
-                mAuth.getCurrentUser().getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
-                    @Override
-                    public void onSuccess(GetTokenResult getTokenResult) {
-                        String message = "NotificationTestMessage";
-                        String userId = "-LemUHWRkloWWtzuSYqt";
-                        if (message != null)
-                        {
-                            Map<String, Object> notificationMessage = new HashMap<>();
-                            notificationMessage.put("message", message);
-                            notificationMessage.put("from", mCurrentId);
-
-                            databaseUsers.child("Users/" + userId + "/Notification").setValue(notificationMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d("SS","Notification sent");
-                                }
-                            });
-                            /*
-                            mfirestore.collection("Users/" + userId + "/Notification").add(notificationMessage).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    Log.d("SS","Notification sent");
-                                }
-                            });
-                            //Get username from recyclerview.
-                            //Hvem der skal modtage notifikationen sættes der hvor der står 11.
-                            //Get data
-                            */
-                /*
-                        }
-
-
-                        String token_id = getTokenResult.getToken();
-                        String current_id = mAuth.getCurrentUser().getUid();
-                        Map<String, Object> tokenMap = new HashMap<>();
-                        tokenMap.put("token_id", token_id);
-                        mfirestore.collection("Users").document(current_id).update(tokenMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("ff", "Reached onSuccessListener");
-                            }
-                        });
-                    }
-                });
-*/
-            });
-
-            request_Button.setOnClickListener(v -> {
-                // TODO: 09-05-2019 Should be able to request location from selected user
             });
         }
 
@@ -159,5 +119,30 @@ public class FriendListAdapter extends RecyclerView.Adapter {
             // TODO: 09-05-2019 Add image
             userName_TextView.setText(friendDTOList.get(position).visibleName == null ? friendDTOList.get(position).userName : friendDTOList.get(position).visibleName );
         }
-    }
+
+        private void sendNotification(JSONObject notification)
+        {
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Toast.makeText(context, "Notification sent!", Toast.LENGTH_SHORT).show();
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(context, "Error sending notification", Toast.LENGTH_SHORT).show();
+                }
+            }){
+                public Map<String, String> getHeaders()throws AuthFailureError{
+                    Map<String, String> parameters = new HashMap<>();
+                    parameters.put("Authorization", SERVER_KEY);
+                    parameters.put("Content-Type", CONTENT_TYPE);
+                    return parameters;
+                }
+            };
+
+            MySingleton.getInstance(context.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+        }
+}
 }

@@ -11,12 +11,13 @@ import android.view.ViewGroup;
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
 import com.emmamilverts.friendfinder.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryListFragment extends Fragment {
     List<FriendDTO> friends;
     public HistoryListFragment() {
-        friends = new FriendDTO().preFillHistoryList();
+        friends = new ArrayList<FriendDTO>();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.emmamilverts.friendfinder;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -7,23 +8,28 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.emmamilverts.friendfinder.DTO.FriendDTO;
 import com.emmamilverts.friendfinder.FriendList.FriendListFragment;
 import com.emmamilverts.friendfinder.FriendRequestList.FriendRequestListFragment;
 import com.emmamilverts.friendfinder.HistoryList.HistoryListFragment;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener mAuthListener;
 
-    DatabaseReference databaseUsers;
+    DatabaseReference databaseCurrentUser;
+    DatabaseReference databaseFriendRequests;
+    private String selectedUsername;
 
     @Override
     protected void onStart() {
@@ -81,13 +89,37 @@ public class MainActivity extends AppCompatActivity {
                 mAuth.signOut();
             }
         });
+        if (mAuth.getCurrentUser() != null) {
+            databaseCurrentUser = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
 
-        databaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
-        AddUser();
+            databaseCurrentUser.child("username").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Object userNameObject = dataSnapshot.getValue();
+                    if (userNameObject == null)
+                    {
+                        firstTimeLogin();
+                    }
+                }
 
-        loadFragment(new FriendListFragment());
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+            loadFragment(new FriendListFragment());
+        }
+
+
+
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    private void firstTimeLogin()
+    {
+        chooseUserName();
     }
     private boolean loadFragment(Fragment fragment) {
         //switching fragment
@@ -102,22 +134,40 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private void AddUser(){
-        String Name = "TestName1";
-        String id = databaseUsers.push().getKey();
-        List<User> Friends = new ArrayList<>();
-        User Friend1 = new User("1", "Friend1");
-        User Friend2 = new User("2", "Friend2");
-        Friends.add(Friend1);
-        Friends.add(Friend2);
-        User user = new User(id, Name, Friends);
+    private void AddUserToFirebaseDB(){
+        List<FriendDTO> Friends = new ArrayList<>();
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        String userEmail = firebaseUser.getEmail();
 
-        String message = "TestMessage";
-        Map<String, Object> notificationMessage = new HashMap<>();
-        notificationMessage.put("message", message);
+        User user = new User(selectedUsername, Friends, userEmail);
 
-        databaseUsers.child(id).setValue(user);
-        //databaseUsers.child(id + "/Notification").setValue(notificationMessage);
+        databaseCurrentUser.setValue(user);
+        databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendRequests").child(mAuth.getUid());
+
         Toast.makeText(this, "User added", Toast.LENGTH_SHORT).show();
+    }
+
+    private void chooseUserName()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Please choose a username");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            selectedUsername= input.getText().toString();
+            String id = mAuth.getUid();
+
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Usernames").child(selectedUsername);
+            ref.setValue(id);
+            AddUserToFirebaseDB();
+        });
+
+        builder.setCancelable(false);
+        builder.show();
     }
 }
