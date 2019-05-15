@@ -15,11 +15,19 @@
       },
       "oauth_client": [
         {
-          "client_id": "972479203302-m2p5isrjlgobcblcu4a8avq1k6l285e3.apps.googleusercontent.com",
+          "client_id": "972479203302-sf1mat7l8h7ifjebskj66e59m4rkhcu6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.emmamilverts.friendfinder",
-            "certificate_hash": "6f754f063002f6b8e9b9e9814457c42f460da20c"
+            "certificate_hash": "db4226bf1633f68cf201998d6431af770aad7757"
+          }
+        },
+        {
+          "client_id": "972479203302-okt1jc444hbpks89jbjs42om8611ial7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.emmamilverts.friendfinder",
+            "certificate_hash": "17339e841c52c25583e99575de5089df05000cf8"
           }
         },
         {

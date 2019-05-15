@@ -38,7 +38,7 @@ public class FriendListAdapter extends RecyclerView.Adapter {
     private String mCurrentId;
     DatabaseReference databaseUsers;
     final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
-    final private String SERVER_KEY = "key=AIzaSyAVtluMmMAF6EheSqzVwiT2aklJffkKeG0";
+    final private String SERVER_KEY = "key=AAAA4mxHB-Y:APA91bHYQsp4uUj_6zHGj6fvqKP1OMSxkwco9tXs4gwx2aCp90ifJ7P6SEUqXIjC1XizR3JqNlluynATkYaS03ximFtn3Jg0h5VzKADb0i68pNoW3dXVh9FGm6xRpP5igjLUXDqoi-4H";
     final private String CONTENT_TYPE = "application/json";
     final String TAG = "NOTIFICATION_TAG";
 
@@ -86,7 +86,7 @@ public class FriendListAdapter extends RecyclerView.Adapter {
                 databaseUsers.child(mAuth.getUid()).child("username").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        String TOPIC = "/Notification/"+ mAuth.getUid();
+                        String TOPIC = "/topics/"+ friendDTOList.get(getAdapterPosition()).userId;
                         String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + "has sent you a location";
                         String NOTIFICATION_TITLE = "New location has arrived!";
                         JSONObject notification = new JSONObject();
@@ -94,6 +94,7 @@ public class FriendListAdapter extends RecyclerView.Adapter {
                         try {
                             notificationBody.put("title", NOTIFICATION_TITLE);
                             notificationBody.put("message", NOTIFICATION_MESSAGE);
+                            notificationBody.put("Coordinates","56.170785, 10.189453");
 
                             notification.put("to", TOPIC);
                             notification.put("data", notificationBody);

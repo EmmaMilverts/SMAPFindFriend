@@ -14,7 +14,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -22,13 +21,13 @@ import java.util.Random;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "mFirebaseIIDService";
-    private String SUBSCRIBE_TO = "";
     FirebaseAuth mAuth;
     private final String ADMIN_CHANNEL_ID = "admin_channel";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + remoteMessage.getData().get("Coordinates")));
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         int notificationID = new Random().nextInt(3000);
@@ -43,6 +42,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Uri notificationUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(remoteMessage.getData().get("Username"))
                 .setContentText("Click here to see the location")
                 .setAutoCancel(true)
@@ -55,17 +55,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         notificationManager.notify(notificationID, notificationBuilder.build());
-
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
-        Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
     }
 
     @Override
     public void onNewToken(String s) {
         super.onNewToken(s);
         mAuth = FirebaseAuth.getInstance();
-        FirebaseMessaging.getInstance().subscribeToTopic(mAuth.getUid());
-        Log.d("NEW_TOKEN",s);
+        if (mAuth != null)
+        {
+            Log.d("NEW_TOKEN",s);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
