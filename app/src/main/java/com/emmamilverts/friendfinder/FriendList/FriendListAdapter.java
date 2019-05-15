@@ -127,6 +127,9 @@ public class FriendListAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onResponse(JSONObject response) {
                     Toast.makeText(context, "Notification sent!", Toast.LENGTH_SHORT).show();
+                    databaseUsers.child(friendDTOList.get(getAdapterPosition()).userId).child("Friends").child(mAuth.getUid()).child("Locations");
+                    
+
 
                 }
             }, new Response.ErrorListener() {
