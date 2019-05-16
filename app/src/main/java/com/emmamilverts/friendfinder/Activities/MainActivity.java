@@ -224,12 +224,15 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             Toast.makeText(this, "Please type a username", Toast.LENGTH_SHORT).show();
+            chooseUserName();
         }
     }
 
     private void chooseUserName()
     {
-        chooseUserNameState = true;
+        if (chooseUserNameState){
+            return;
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.Please_choose_a_username));
 
@@ -251,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setCancelable(false);
         builder.show();
+        chooseUserNameState = true;
     }
 
     @Override

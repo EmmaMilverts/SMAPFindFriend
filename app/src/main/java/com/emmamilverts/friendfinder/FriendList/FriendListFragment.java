@@ -129,13 +129,18 @@ public class FriendListFragment extends Fragment {
             databaseUsernames.child(input.getText().toString()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String friendUId = dataSnapshot.getValue().toString();
-                    if (friendUId != null && friendUId != mAuth.getUid())
+                    Object friendUId = dataSnapshot.getValue();
+                    if (friendUId == null)
+                    {
+                        Toast.makeText(mContext, mContext.getString(R.string.User_doesnt_exist), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (friendUId.toString() != null && friendUId.toString() != mAuth.getUid())
                     {
                         databaseCurrentUser.child("username").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                databaseFriendRequests.child(friendUId).child(mAuth.getUid()).setValue(dataSnapshot.getValue().toString());
+                                databaseFriendRequests.child(friendUId.toString()).child(mAuth.getUid()).setValue(dataSnapshot.getValue().toString());
                                 main.setDialogState(false);
                             }
 
@@ -149,10 +154,7 @@ public class FriendListFragment extends Fragment {
                     {
                         Toast.makeText(mContext, mContext.getString(R.string.You_cannot_add_yourself_as_a_friend), Toast.LENGTH_SHORT).show();
                     }
-                    if (friendUId == null)
-                    {
-                        Toast.makeText(mContext, mContext.getString(R.string.User_doesnt_exist), Toast.LENGTH_SHORT).show();
-                    }
+
                 }
 
                 @Override
