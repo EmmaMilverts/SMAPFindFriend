@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference databaseFriendRequests;
     FirebaseAuth.AuthStateListener mAuthListener;
     String activeFragmentName;
+    Intent serviceIntent;
     private boolean showAddFriendDialog;
     private boolean chooseUserNameState;
 
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Intent serviceIntent = new Intent(this, LocationService.class);
+        serviceIntent = new Intent(this, LocationService.class);
         bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
         mAuth.addAuthStateListener(mAuthListener);
     }
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         if (mBound){
             unbindService(mConnection);
+            stopService(serviceIntent);
             mBound = false;
         }
     }
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
             mService = binder.getService();
             mBound = true;
+            mService.setmContext(getApplicationContext());
         }
 
     

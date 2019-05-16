@@ -2,15 +2,19 @@ package com.emmamilverts.friendfinder.Services;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+
 
 
 public class LocationService extends Service {
@@ -19,11 +23,13 @@ public class LocationService extends Service {
 
     public static final String RESULT_LOCATION_OBJECT = "RESULT_LOCATION_OBJECT";
     public static final String RESULT_USER_ID = "RESULT_USER_ID";
-
+    public Context mContext;
     private final IBinder mBinder = new LocalBinder();
     private FusedLocationProviderClient fusedLocationClient;
 
-
+    public void setmContext(Context context) {
+        this.mContext = context;
+    }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -49,14 +55,15 @@ public class LocationService extends Service {
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(ACTION_REQUEST_LOCATION_PERMISSION);
             intent.putExtra(RESULT_USER_ID, userId);
-            getApplicationContext().sendBroadcast(intent);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
         } else {
             fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                 if (location != null) {
+                    Log.d("ButtonClick","InService");
                     Intent intent = new Intent(ACTION_GET_LOCATION);
                     intent.putExtra(RESULT_LOCATION_OBJECT, location);
                     intent.putExtra(RESULT_USER_ID, userId);
-                    sendBroadcast(intent);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                 }
             });
         }

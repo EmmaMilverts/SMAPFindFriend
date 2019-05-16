@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
@@ -98,17 +99,17 @@ public class FriendListFragment extends Fragment {
         if(main.showDialogState()) {
             openAddFriendDialog();
         }
-        locationReceiver = new LocationReceiver();
-        permissionReceiver = new PermissionReceiver();
-        Objects.requireNonNull(getActivity()).registerReceiver(locationReceiver, new IntentFilter(LocationService.ACTION_GET_LOCATION));
-        Objects.requireNonNull(getActivity()).registerReceiver(permissionReceiver,new IntentFilter(LocationService.ACTION_REQUEST_LOCATION_PERMISSION));
+        //Objects.requireNonNull(getActivity()).registerReceiver(locationReceiver, new IntentFilter(LocationService.ACTION_GET_LOCATION));
+        //Objects.requireNonNull(getActivity()).registerReceiver(permissionReceiver,new IntentFilter(LocationService.ACTION_REQUEST_LOCATION_PERMISSION));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        /*
         Objects.requireNonNull(getActivity()).unregisterReceiver(locationReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(permissionReceiver);
+        */
     }
 
     // SOURCE: https://stackoverflow.com/questions/10903754/input-text-dialog-android
@@ -173,7 +174,19 @@ public class FriendListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        locationReceiver = new LocationReceiver();
+        permissionReceiver = new PermissionReceiver();
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(locationReceiver,new IntentFilter(LocationService.ACTION_GET_LOCATION));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(permissionReceiver,new IntentFilter(LocationService.ACTION_REQUEST_LOCATION_PERMISSION));
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(locationReceiver);
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(permissionReceiver);
+    }
+
     public LocationService getLocationService(){
         MainActivity main = (MainActivity) getActivity();
         return mService = Objects.requireNonNull(main).getLocationService();
@@ -183,7 +196,7 @@ public class FriendListFragment extends Fragment {
         public void onReceive(Context arg0, Intent arg1) {
                 Location locationObject = arg1.getParcelableExtra(LocationService.RESULT_LOCATION_OBJECT);
                 String userId = arg1.getStringExtra(LocationService.RESULT_USER_ID);
-
+                Log.d("ButtonClick","Receiver");
             sendLocationNotification(userId, locationObject);
         }
     }
@@ -293,14 +306,6 @@ public class FriendListFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d("SINGLEVALUEEVENT", "VALUE FETCHED FROM DB");
-                if ( dataSnapshot.getValue() == null) {
-                    // We do now know how the hell this works. Like... No clue at all.
-                    // First time the UID does't match, we assume this is because of some Firebase Caching.
-                    // Somehow this method is called twice, and the first time the mAuth.getUid() is called, it will return a value that does not exist in the db
-                    // The seconds time it will return the correct Uid. This is why we return, if the value doesn't exist.
-                    // The app will only go into this if-statement once during its lifecycle.
-                    return;
-                }
                 String TOPIC = "/topics/"+ userId;
                 String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + mContext.getString(R.string.has_sent_you_a_location);
                 String NOTIFICATION_TITLE = mContext.getString(R.string.new_location_has_arrived);

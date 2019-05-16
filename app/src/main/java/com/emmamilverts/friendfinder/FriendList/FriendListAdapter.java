@@ -61,7 +61,7 @@ public class FriendListAdapter extends RecyclerView.Adapter {
             request_Button = itemView.findViewById(R.id.requestLocationButton);
 
             send_Button.setOnClickListener(v -> {
-                Log.d("TEST","TEST");
+                Log.d("ButtonClick","ActualClick");
                 LocationService mService = fragment.getLocationService();
                 mService.getLocation(friendDTOList.get(getAdapterPosition()).userId);
             });
