@@ -15,15 +15,12 @@ import android.support.v4.app.NotificationCompat;
 import com.emmamilverts.friendfinder.Activities.MainActivity;
 import com.emmamilverts.friendfinder.FriendList.FriendListFragment;
 import com.emmamilverts.friendfinder.R;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Random;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    private static final String TAG = "mFirebaseIIDService";
-    FirebaseAuth mAuth;
     private final String ADMIN_CHANNEL_ID = "admin_channel";
 
     @Override
@@ -58,11 +55,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(remoteMessage.getData().get("username"))
-                .setContentText("Requests your location")
+                .setContentText(getString(R.string.Requests_your_location_notifcation))
                 .setAutoCancel(true)
                 .setSound(notificationUri)
                 .setContentIntent(pendingIntent)
-                .addAction(R.drawable.ic_notifications_black_24dp, "Send location", pendingIntent);
+                .addAction(R.drawable.ic_notifications_black_24dp, getString(R.string.send_location), pendingIntent);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
@@ -90,7 +87,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(remoteMessage.getData().get("username"))
-                .setContentText("Click here to see the location")
+                .setContentText(getString(R.string.click_here_to_see_the_location_notification))
                 .setAutoCancel(true)
                 .setSound(notificationUri)
                 .setContentIntent(pendingIntent);

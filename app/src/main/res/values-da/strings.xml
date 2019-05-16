@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FriendFinder</string>
+    <string name="Add_Friend_Button">Tilføj</string>
+    <string name="Authentication_failed">Valideringsfejl</string>
+    <string name="Database_error">Databasefejl</string>
+    <string name="Error_sending_notification">Fejl ved lokalitets forespørgsel</string>
+    <string name="Location_request">Lokalitets forespørgsel</string>
+    <string name="Login_failed">Login fejl</string>
+    <string name="Please_choose_a_username">Indtast venligst brugernavn</string>
+    <string name="Please_enter_email">Indtast venligst email</string>
+    <string name="Please_enter_password">Indtast venligst kodeord</string>
+    <string name="Requests_your_location_notifcation">Forespørger din lokalitet</string>
+    <string name="SignOut">Log ud</string>
+    <string name="Signing_Out">Logget ud</string>
+    <string name="Type_user_name">Indtast modtagers brugernavn</string>
+    <string name="User_doesnt_exist">Bruger eksisterer ikke</string>
+    <string name="You_cannot_add_yourself_as_a_friend">Du kan ikke tilføje dig selv som ven</string>
+    <string name="already_a_member_login">Allerede medlem? Login</string>
+    <string name="cancel_button">Annuller</string>
+    <string name="click_here_to_see_the_location_notification">Tryk for at se lokalitet</string>
+    <string name="create_a_new_account">Opret ny konto</string>
+    <string name="create_account">Opret konto</string>
+    <string name="email">Indtast email</string>
+    <string name="has_sent_you_a_location">har sendt sin lokalitet</string>
+    <string name="hours_ago">time(r) siden</string>
+    <string name="login">Login</string>
+    <string name="minutes_ago">minut(ter) siden</string>
+    <string name="new_location_has_arrived">Ny lokalitet!</string>
+    <string name="notification_sent">Notifikation sendt!</string>
+    <string name="password">Indtast kodeord</string>
+    <string name="wants_to_see_your_location">vil gerne se din lokalitet</string>
+    <string name="title_notifications">Notifikationer</string>
+    <string name="title_home">Hjem</string>
+    <string name="title_history">Historik</string>
+    <string name="title_friends_requests">Anmodninger</string>
+    <string name="title_friends">Venner</string>
+    <string name="title_dashboard">Skrivebord</string>
+    <string name="send_location">Send lokalitet</string>
+    <string name="request">Anmodning</string>
+</resources>

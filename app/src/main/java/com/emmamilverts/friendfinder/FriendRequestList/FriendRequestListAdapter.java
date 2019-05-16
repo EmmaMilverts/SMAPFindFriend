@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FriendRequestListAdapter extends RecyclerView.Adapter {
     private List<FriendDTO> friendDTOList;
@@ -37,7 +38,7 @@ public class FriendRequestListAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friendrequestlist_item, parent, false);
         mAuth = FirebaseAuth.getInstance();
-        databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendsRequests").child(mAuth.getUid());
+        databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendsRequests").child(Objects.requireNonNull(mAuth.getUid()));
         return new ListViewholder(view);
     }
 
@@ -128,7 +129,7 @@ public class FriendRequestListAdapter extends RecyclerView.Adapter {
         }
 
         public void bindView(int position) {
-            userName_TextView.setText(friendDTOList.get(position).visibleName == null ? friendDTOList.get(position).userName : friendDTOList.get(position).visibleName);
+            userName_TextView.setText(friendDTOList.get(position).userName);
         }
     }
 }

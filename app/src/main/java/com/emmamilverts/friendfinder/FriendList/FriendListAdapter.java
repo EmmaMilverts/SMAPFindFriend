@@ -10,8 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
-import com.emmamilverts.friendfinder.Services.LocationService;
 import com.emmamilverts.friendfinder.R;
+import com.emmamilverts.friendfinder.Services.LocationService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -21,14 +21,11 @@ import java.util.List;
 public class FriendListAdapter extends RecyclerView.Adapter {
 
     FirebaseAuth mAuth;
-    private String mCurrentId;
     DatabaseReference databaseUsers;
-
-
-
     private List<FriendDTO> friendDTOList;
     private Context context;
     private FriendListFragment fragment;
+
     public FriendListAdapter(List<FriendDTO> friendDTOList, Context context, FriendListFragment fragment){
         this.friendDTOList = friendDTOList;
         this.context = context;
@@ -39,7 +36,6 @@ public class FriendListAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friendlist_item,parent,false);
         mAuth = FirebaseAuth.getInstance();
-        mCurrentId = FirebaseAuth.getInstance().getUid();
         databaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         return new ListViewholder(view);
     }
@@ -68,16 +64,11 @@ public class FriendListAdapter extends RecyclerView.Adapter {
                 mService.getLocation(friendDTOList.get(getAdapterPosition()).userId);
             });
 
-            request_Button.setOnClickListener(v -> {
-                fragment.sendRequestNotification(friendDTOList.get(getAdapterPosition()).userId);
-            });
+            request_Button.setOnClickListener(v -> fragment.sendRequestNotification(friendDTOList.get(getAdapterPosition()).userId));
         }
 
         public void bindView(int position){
-            // TODO: 09-05-2019 Add image
-            userName_TextView.setText(friendDTOList.get(position).visibleName == null ? friendDTOList.get(position).userName : friendDTOList.get(position).visibleName );
+            userName_TextView.setText(friendDTOList.get(position).userName);
         }
-
-
-}
+    }
 }

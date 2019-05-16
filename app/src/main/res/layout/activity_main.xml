@@ -14,21 +14,15 @@
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="545dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="54dp"
+        android:layout_marginBottom="56dp"
         android:background="@color/colorBackground"
         app:layout_constraintBottom_toTopOf="@+id/navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.0">
-
-
-        <Button
-            android:id="@+id/btnSignOut"
-            android:layout_width="102dp"
-            android:layout_height="wrap_content"
-            android:text="@string/SignOut" />
-    </FrameLayout>
+        app:layout_constraintVertical_bias="0.0" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

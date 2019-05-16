@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.card.MaterialCardView xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="wrap_content"
+<android.support.design.card.MaterialCardView android:layout_height="wrap_content"
     style="@style/CardView.Light"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -10,8 +9,7 @@
     android:layout_marginEnd="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="100dp">
 
@@ -22,7 +20,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:text="User Name"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -49,7 +46,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/colorPrimary"
+            app:backgroundTint="@color/colorPrimary"
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/ic_cancel_black_24dp"

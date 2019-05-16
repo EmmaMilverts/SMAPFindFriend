@@ -15,6 +15,7 @@ import com.emmamilverts.friendfinder.GoogleMapsEncode;
 import com.emmamilverts.friendfinder.R;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class HistoryListAdapter extends RecyclerView.Adapter {
     private List<HistoryDTO> historyList;
@@ -62,7 +63,13 @@ public class HistoryListAdapter extends RecyclerView.Adapter {
         public void bindView(int position){
             userName_TextView.setText(historyList.get(position).username);
             location_TextView.setText(historyList.get(position).coordinates);
-            updateTime_TextView.setText(historyList.get(position).getTime());
+            long timeInMillisecond = historyList.get(position).getTime();
+            if (TimeUnit.MILLISECONDS.toMinutes(timeInMillisecond) > 60){
+                updateTime_TextView.setText(String.format("%s %s", String.valueOf(TimeUnit.MILLISECONDS.toHours(timeInMillisecond)), context.getString(R.string.hours_ago)));
+            }
+            else {
+                updateTime_TextView.setText(String.format("%s %s", String.valueOf(TimeUnit.MILLISECONDS.toMinutes(timeInMillisecond)), context.getString(R.string.minutes_ago)));
+            }
         }
     }
 }

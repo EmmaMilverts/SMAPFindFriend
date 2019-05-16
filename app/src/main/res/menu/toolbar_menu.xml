@@ -5,11 +5,11 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_favorite"
+        android:id="@+id/log_out_button"
         android:orderInCategory="300"
-        android:title="User"
-        android:icon="@drawable/ic_add_black_24dp"
-        app:showAsAction="ifRoom"></item>
+        android:title="@string/log_out_button"
+        android:icon="@drawable/ic_log_out_24dp"
+        app:showAsAction="ifRoom"/>
 
 
 </menu>

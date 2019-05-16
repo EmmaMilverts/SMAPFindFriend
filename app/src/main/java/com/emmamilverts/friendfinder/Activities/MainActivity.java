@@ -18,7 +18,6 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -40,6 +39,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -125,10 +125,8 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null){
             if(savedInstanceState.getBoolean("chooseUserNameState")) {
                 chooseUserName();
-            };
+            }
         }
-        Button btnSignOut = findViewById(R.id.btnSignOut);
-        btnSignOut.setOnClickListener(v -> mAuth.signOut());
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mAuth = FirebaseAuth.getInstance();
@@ -142,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         if (mAuth.getCurrentUser() != null) {
-            databaseCurrentUser = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
+            databaseCurrentUser = FirebaseDatabase.getInstance().getReference().child("Users").child(Objects.requireNonNull(mAuth.getUid()));
 
             databaseCurrentUser.child("username").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -165,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null){
             String fragmentName = savedInstanceState.getString("ActiveFragmentName");
             showAddFriendDialog = savedInstanceState.getBoolean("ShowAddFriendDialog");
+            assert fragmentName != null;
             switch (fragmentName) {
                 case "FriendListFragment":
                     loadFragment(new FriendListFragment());
@@ -209,12 +208,13 @@ public class MainActivity extends AppCompatActivity {
     private void AddUserToFirebaseDB(){
         List<FriendDTO> Friends = new ArrayList<>();
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        assert firebaseUser != null;
         String userEmail = firebaseUser.getEmail();
 
         UserDTO userDTO = new UserDTO(selectedUsername, Friends, userEmail);
 
         databaseCurrentUser.setValue(userDTO);
-        databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendRequests").child(mAuth.getUid());
+        databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendRequests").child(Objects.requireNonNull(mAuth.getUid()));
 
         Toast.makeText(this, "UserDTO added", Toast.LENGTH_SHORT).show();
     }
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
     {
         chooseUserNameState = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Please choose a username");
+        builder.setTitle(getString(R.string.Please_choose_a_username));
 
         // Set up the input
         final EditText input = new EditText(this);
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(input);
 
         // Set up the buttons
-        builder.setPositiveButton("Add", (dialog, which) -> {
+        builder.setPositiveButton(getString(R.string.Add_Friend_Button), (dialog, which) -> {
             selectedUsername= input.getText().toString();
             String id = mAuth.getUid();
 
@@ -271,9 +271,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_favorite)
+        if (id == R.id.log_out_button)
         {
-            Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+            mAuth.signOut();
+            Toast.makeText(this, getString(R.string.Signing_Out), Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
