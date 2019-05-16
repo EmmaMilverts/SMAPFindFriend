@@ -211,12 +211,17 @@ public class MainActivity extends AppCompatActivity {
         assert firebaseUser != null;
         String userEmail = firebaseUser.getEmail();
 
-        UserDTO userDTO = new UserDTO(selectedUsername, Friends, userEmail);
+        if(!selectedUsername.equals("")){
+            UserDTO userDTO = new UserDTO(selectedUsername, Friends, userEmail);
 
-        databaseCurrentUser.setValue(userDTO);
-        databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendRequests").child(Objects.requireNonNull(mAuth.getUid()));
+            databaseCurrentUser.setValue(userDTO);
+            databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendRequests").child(Objects.requireNonNull(mAuth.getUid()));
 
-        Toast.makeText(this, "UserDTO added", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Username created", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this, "Please type a username", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void chooseUserName()
