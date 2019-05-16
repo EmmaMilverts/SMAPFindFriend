@@ -16,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
+import com.emmamilverts.friendfinder.LocationService;
 import com.emmamilverts.friendfinder.MySingleton;
 import com.emmamilverts.friendfinder.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,11 +46,12 @@ public class FriendListAdapter extends RecyclerView.Adapter {
 
     private List<FriendDTO> friendDTOList;
     private Context context;
-    public FriendListAdapter(List<FriendDTO> friendDTOList, Context context){
+    private FriendListFragment fragment;
+    public FriendListAdapter(List<FriendDTO> friendDTOList, Context context, FriendListFragment fragment){
         this.friendDTOList = friendDTOList;
         this.context = context;
+        this.fragment = fragment;
     }
-
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
@@ -81,7 +83,6 @@ public class FriendListAdapter extends RecyclerView.Adapter {
             send_Button  = itemView.findViewById(R.id.sendLocationButton);
             request_Button = itemView.findViewById(R.id.requestLocationButton);
 
-
             send_Button.setOnClickListener(v -> {
                 databaseUsers.child(mAuth.getUid()).child("username").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -111,8 +112,14 @@ public class FriendListAdapter extends RecyclerView.Adapter {
 
                     }
                 });
+                // TODO: 09-05-2019 Should be able to send location to selected user
+               LocationService mService = fragment.getLocationService();
+               mService.getLocation();
+            });
 
-
+            request_Button.setOnClickListener(v -> {
+                // TODO: 09-05-2019 Should be able to request location from selected user
+                LocationService mService = fragment.getLocationService();
             });
         }
 
@@ -128,7 +135,7 @@ public class FriendListAdapter extends RecyclerView.Adapter {
                 public void onResponse(JSONObject response) {
                     Toast.makeText(context, "Notification sent!", Toast.LENGTH_SHORT).show();
                     databaseUsers.child(friendDTOList.get(getAdapterPosition()).userId).child("Friends").child(mAuth.getUid()).child("Locations");
-                    
+
 
 
                 }

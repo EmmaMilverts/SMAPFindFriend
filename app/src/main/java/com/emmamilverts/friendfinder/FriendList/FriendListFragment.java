@@ -1,9 +1,16 @@
 package com.emmamilverts.friendfinder.FriendList;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +22,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
+import com.emmamilverts.friendfinder.LocationService;
+import com.emmamilverts.friendfinder.MainActivity;
 import com.emmamilverts.friendfinder.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -25,8 +34,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FriendListFragment extends Fragment {
+    private static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 1000;
     List<FriendDTO> friends;
     FirebaseAuth mAuth;
     private String mCurrentId;
@@ -35,6 +46,7 @@ public class FriendListFragment extends Fragment {
     DatabaseReference databaseFriendRequests;
     FriendListAdapter listAdapter;
 
+    LocationService mService;
     public FriendListFragment() {
         friends = new ArrayList<FriendDTO>();
     }
@@ -43,7 +55,7 @@ public class FriendListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_friend_list,container,false);
         RecyclerView recyclerView = view.findViewById(R.id.friendRecycleView);
-        listAdapter = new FriendListAdapter(friends, getContext());
+        listAdapter = new FriendListAdapter(friends, getContext(),this);
         recyclerView.setAdapter(listAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         FloatingActionButton add_Button = view.findViewById(R.id.add_FAB);
@@ -106,6 +118,36 @@ public class FriendListFragment extends Fragment {
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Objects.requireNonNull(getActivity()).registerReceiver(new LocationReciever(), new IntentFilter(LocationService.ACTION_GET_LOCATION));
+        Objects.requireNonNull(getActivity()).registerReceiver(new PermissionReceiver(),new IntentFilter(LocationService.ACTION_REQUEST_LOCATION_PERMISSION));
+    }
+    public LocationService getLocationService(){
+        MainActivity main = (MainActivity) getActivity();
+        return mService = Objects.requireNonNull(main).getLocationService();
+    }
+    private class LocationReciever extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+                Location locationObject = arg1.getParcelableExtra(LocationService.RESULT_LOCATION_OBJECT);
+                // TODO: 13-05-2019 Call Firebaseservice and send Location to user
+                Toast.makeText(getActivity(), "Location object fetched", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private class PermissionReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Requests permission if not granted already
+            ActivityCompat.requestPermissions(Objects.requireNonNull(getActivity()),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_READ_LOCATION);
+            Toast.makeText(context, "Requesting permissions", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setUpListeners()
