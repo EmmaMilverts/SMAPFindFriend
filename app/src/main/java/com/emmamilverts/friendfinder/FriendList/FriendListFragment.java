@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,8 @@ public class FriendListFragment extends Fragment {
     DatabaseReference databaseFriendRequests;
     DatabaseReference databaseUsers;
     FriendListAdapter listAdapter;
+    LocationReceiver locationReceiver;
+    PermissionReceiver permissionReceiver;
     private Context mContext;
     final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
     final private String SERVER_KEY = "key=AAAA4mxHB-Y:APA91bHYQsp4uUj_6zHGj6fvqKP1OMSxkwco9tXs4gwx2aCp90ifJ7P6SEUqXIjC1XizR3JqNlluynATkYaS03ximFtn3Jg0h5VzKADb0i68pNoW3dXVh9FGm6xRpP5igjLUXDqoi-4H";
@@ -95,6 +98,17 @@ public class FriendListFragment extends Fragment {
         if(main.showDialogState()) {
             openAddFriendDialog();
         }
+        locationReceiver = new LocationReceiver();
+        permissionReceiver = new PermissionReceiver();
+        Objects.requireNonNull(getActivity()).registerReceiver(locationReceiver, new IntentFilter(LocationService.ACTION_GET_LOCATION));
+        Objects.requireNonNull(getActivity()).registerReceiver(permissionReceiver,new IntentFilter(LocationService.ACTION_REQUEST_LOCATION_PERMISSION));
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Objects.requireNonNull(getActivity()).unregisterReceiver(locationReceiver);
+        Objects.requireNonNull(getActivity()).unregisterReceiver(permissionReceiver);
     }
 
     // SOURCE: https://stackoverflow.com/questions/10903754/input-text-dialog-android
@@ -157,8 +171,6 @@ public class FriendListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Objects.requireNonNull(getActivity()).registerReceiver(new LocationReceiver(), new IntentFilter(LocationService.ACTION_GET_LOCATION));
-        Objects.requireNonNull(getActivity()).registerReceiver(new PermissionReceiver(),new IntentFilter(LocationService.ACTION_REQUEST_LOCATION_PERMISSION));
     }
     public LocationService getLocationService(){
         MainActivity main = (MainActivity) getActivity();
@@ -274,9 +286,11 @@ public class FriendListFragment extends Fragment {
 
     public void sendLocationNotification(String userId, Location locationObject)
     {
+        Log.d("ButtonClick", "ButtonClicked");
         databaseCurrentUser.child("username").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("SINGLEVALUEEVENT", "VALUE FETCHED FROM DB");
                 String TOPIC = "/topics/"+ userId;
                 String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + mContext.getString(R.string.has_sent_you_a_location);
                 String NOTIFICATION_TITLE = mContext.getString(R.string.new_location_has_arrived);
