@@ -68,7 +68,10 @@ public class SignInActivity extends AppCompatActivity {
         Button signUpLogin = findViewById(R.id.sign_up_button);
         btnSignInGoogle = findViewById(R.id.sign_in_google);
 
-
+        if (savedInstanceState != null) {
+            inputEmail.setText(savedInstanceState.getString("EMAIL"));
+            inputPassword.setText(savedInstanceState.getString("PASSWORD"));
+        }
         btnSignInGoogle.setOnClickListener(v -> signIn());
 
         signUpLogin.setOnClickListener(v -> startActivity(new Intent(SignInActivity.this, SignUpActivity.class)));
@@ -149,5 +152,12 @@ public class SignInActivity extends AppCompatActivity {
                 Toast.makeText(SignInActivity.this, getString(R.string.Authentication_failed), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("EMAIL",inputEmail.getText().toString());
+        outState.putString("PASSWORD",inputPassword.getText().toString());
     }
 }

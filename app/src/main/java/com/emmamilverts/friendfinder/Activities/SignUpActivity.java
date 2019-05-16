@@ -43,6 +43,10 @@ public class SignUpActivity extends AppCompatActivity {
         password_check = findViewById(R.id.input_password);
         Button ahSignUp = findViewById(R.id.btn_signup);
 
+        if (savedInstanceState != null) {
+            email_id.setText(savedInstanceState.getString("EMAIL"));
+            password_check.setText(savedInstanceState.getString("PASSWORD"));
+        }
         ahSignUp.setOnClickListener(v -> {
             String email = email_id.getText().toString();
             String password = password_check.getText().toString();
@@ -73,5 +77,11 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     });
         });
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("EMAIL",email_id.getText().toString());
+        outState.putString("PASSWORD",password_check.getText().toString());
     }
 }
