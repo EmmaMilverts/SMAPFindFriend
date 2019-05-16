@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "972479203302",
+    "firebase_url": "https://smapfriendfinder-a07d0.firebaseio.com",
+    "project_id": "smapfriendfinder-a07d0",
+    "storage_bucket": "smapfriendfinder-a07d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:972479203302:android:7f52b92fcda42a04",
+        "android_client_info": {
+          "package_name": "com.emmamilverts.friendfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "972479203302-sf1mat7l8h7ifjebskj66e59m4rkhcu6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.emmamilverts.friendfinder",
+            "certificate_hash": "db4226bf1633f68cf201998d6431af770aad7757"
+          }
+        },
+        {
+          "client_id": "972479203302-okt1jc444hbpks89jbjs42om8611ial7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.emmamilverts.friendfinder",
+            "certificate_hash": "17339e841c52c25583e99575de5089df05000cf8"
+          }
+        },
+        {
+          "client_id": "972479203302-d47si4oflonlqttg1gb9slas9pn3tkb7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCeHiZOawNS6riZMEoD40Ep5uy18cQ9oA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "972479203302-d47si4oflonlqttg1gb9slas9pn3tkb7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
