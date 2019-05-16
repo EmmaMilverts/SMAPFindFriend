@@ -57,6 +57,7 @@ public class FriendListFragment extends Fragment {
     DatabaseReference databaseFriendRequests;
     DatabaseReference databaseUsers;
     FriendListAdapter listAdapter;
+    private Context mContext;
     final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
     final private String SERVER_KEY = "key=AAAA4mxHB-Y:APA91bHYQsp4uUj_6zHGj6fvqKP1OMSxkwco9tXs4gwx2aCp90ifJ7P6SEUqXIjC1XizR3JqNlluynATkYaS03ximFtn3Jg0h5VzKADb0i68pNoW3dXVh9FGm6xRpP5igjLUXDqoi-4H";
     final private String CONTENT_TYPE = "application/json";
@@ -74,7 +75,7 @@ public class FriendListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_friend_list,container,false);
         RecyclerView recyclerView = view.findViewById(R.id.friendRecycleView);
-        listAdapter = new FriendListAdapter(friends, getContext(),this);
+        listAdapter = new FriendListAdapter(friends, mContext,this);
         recyclerView.setAdapter(listAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         FloatingActionButton add_Button = view.findViewById(R.id.add_FAB);
@@ -89,13 +90,19 @@ public class FriendListFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
     // SOURCE: https://stackoverflow.com/questions/10903754/input-text-dialog-android
     private void openAddFriendDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Type user name");
 
         // Set up the input
-        final EditText input = new EditText(getContext());
+        final EditText input = new EditText(mContext);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
@@ -122,17 +129,17 @@ public class FriendListFragment extends Fragment {
                     }
                     if (friendUId.equals(mAuth.getUid()))
                     {
-                        Toast.makeText(getContext(), "You cannot add yourself as a friend", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "You cannot add yourself as a friend", Toast.LENGTH_SHORT).show();
                     }
                     if (friendUId == null)
                     {
-                        Toast.makeText(getContext(), "User does not exist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "User does not exist", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(getContext(), "Database error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Database error", Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -154,9 +161,7 @@ public class FriendListFragment extends Fragment {
         @Override
         public void onReceive(Context arg0, Intent arg1) {
                 Location locationObject = arg1.getParcelableExtra(LocationService.RESULT_LOCATION_OBJECT);
-                // TODO: 13-05-2019 Call Firebaseservice and send Location to user
                 String userId = arg1.getStringExtra(LocationService.RESULT_USER_ID);
-                Toast.makeText(getActivity(), "Location object fetched", Toast.LENGTH_LONG).show();
 
             sendLocationNotification(userId, locationObject);
         }
@@ -238,12 +243,12 @@ public class FriendListFragment extends Fragment {
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Toast.makeText(getContext(), "Notification sent!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Notification sent!", Toast.LENGTH_SHORT).show();
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(getContext(), "Error requesting location", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Error requesting location", Toast.LENGTH_SHORT).show();
                         }
                     }){
                         public Map<String, String> getHeaders()throws AuthFailureError {
@@ -254,7 +259,7 @@ public class FriendListFragment extends Fragment {
                         }
                     };
 
-                    MySingleton.getInstance(getContext().getApplicationContext()).addToRequestQueue(jsonObjectRequest);                }
+                    MySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);                }
                 catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -294,14 +299,14 @@ public class FriendListFragment extends Fragment {
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Toast.makeText(getContext(), "Notification sent!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Notification sent!", Toast.LENGTH_SHORT).show();
                             LocationDTO locationDTO = new LocationDTO(coordinates, System.currentTimeMillis());
                             databaseUsers.child(userId).child("Friends").child(mAuth.getUid()).child("Locations").setValue(locationDTO);
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(getContext(), "Error sending notification", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Error sending notification", Toast.LENGTH_SHORT).show();
                         }
                     }){
                         public Map<String, String> getHeaders()throws AuthFailureError {
@@ -312,7 +317,7 @@ public class FriendListFragment extends Fragment {
                         }
                     };
 
-                    MySingleton.getInstance(getContext().getApplicationContext()).addToRequestQueue(jsonObjectRequest);                }
+                    MySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);                }
                 catch (JSONException e) {
                     e.printStackTrace();
                 }

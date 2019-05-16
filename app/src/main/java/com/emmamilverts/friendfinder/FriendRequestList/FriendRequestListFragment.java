@@ -1,5 +1,6 @@
 package com.emmamilverts.friendfinder.FriendRequestList;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +27,7 @@ public class FriendRequestListFragment extends Fragment {
     List<FriendDTO> friends;
     DatabaseReference databaseFriendRequests;
     FirebaseAuth mAuth;
+    private Context mContext;
 
     public FriendRequestListFragment() {
         friends = new ArrayList<FriendDTO>();
@@ -36,7 +38,7 @@ public class FriendRequestListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_friendrequest_list,container,false);
         RecyclerView recyclerView = view.findViewById(R.id.friendRequestRecycleView);
-        FriendRequestListAdapter listAdapter = new FriendRequestListAdapter(friends, getContext());
+        FriendRequestListAdapter listAdapter = new FriendRequestListAdapter(friends, mContext);
         recyclerView.setAdapter(listAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAuth = FirebaseAuth.getInstance();
@@ -77,5 +79,11 @@ public class FriendRequestListFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 }

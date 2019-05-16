@@ -1,5 +1,6 @@
 package com.emmamilverts.friendfinder.HistoryList;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ public class HistoryListFragment extends Fragment {
     FirebaseAuth mAuth;
     HistoryListAdapter listAdapter;
     List<HistoryDTO> historyList;
+    private Context mContext;
 
     public HistoryListFragment() {
         historyList = new ArrayList<HistoryDTO>();
@@ -37,13 +39,19 @@ public class HistoryListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history_list, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.historyRecycleView);
-        listAdapter = new HistoryListAdapter(historyList, getContext());
+        listAdapter = new HistoryListAdapter(historyList, mContext);
         recyclerView.setAdapter(listAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAuth = FirebaseAuth.getInstance();
         databaseFriends = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid()).child("Friends");
         getLocationHistory();
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 
     private void getLocationHistory() {
