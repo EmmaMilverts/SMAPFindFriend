@@ -293,6 +293,14 @@ public class FriendListFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d("SINGLEVALUEEVENT", "VALUE FETCHED FROM DB");
+                if ( dataSnapshot.getValue() == null) {
+                    // We do now know how the hell this works. Like... No clue at all.
+                    // First time the UID does't match, we assume this is because of some Firebase Caching.
+                    // Somehow this method is called twice, and the first time the mAuth.getUid() is called, it will return a value that does not exist in the db
+                    // The seconds time it will return the correct Uid. This is why we return, if the value doesn't exist.
+                    // The app will only go into this if-statement once during its lifecycle.
+                    return;
+                }
                 String TOPIC = "/topics/"+ userId;
                 String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + mContext.getString(R.string.has_sent_you_a_location);
                 String NOTIFICATION_TITLE = mContext.getString(R.string.new_location_has_arrived);

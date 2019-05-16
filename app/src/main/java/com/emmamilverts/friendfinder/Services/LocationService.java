@@ -48,6 +48,7 @@ public class LocationService extends Service {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(ACTION_REQUEST_LOCATION_PERMISSION);
+            intent.putExtra(RESULT_USER_ID, userId);
             getApplicationContext().sendBroadcast(intent);
         } else {
             fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
