@@ -37,5 +37,5 @@
     <string name="title_friends">Venner</string>
     <string name="title_dashboard">Skrivebord</string>
     <string name="send_location">Send lokalitet</string>
-    <string name="request">Anmodning</string>
+    <string name="request">Anmod</string>
 </resources>
