@@ -13,6 +13,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.emmamilverts.friendfinder.FriendList.FriendListFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -28,6 +29,61 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
+        String type = remoteMessage.getData().get("notificationType");
+
+        if(type.equals(FriendListFragment.NOTIFICATION_TYPE_SEND_LOCATION)){
+            createLocationNotification(remoteMessage);
+        }
+
+        if(type.equals(FriendListFragment.NOTIFICATION_TYPE_REQUEST_LOCATION)){
+            createNotificationRequestNotification(remoteMessage);
+        }
+    }
+
+    private void createNotificationRequestNotification(RemoteMessage remoteMessage) {
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        int notificationID = new Random().nextInt(3000);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            setupChannels(notificationManager);
+        }
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Object test = remoteMessage.getData();
+        notificationIntent.putExtra("UserId", remoteMessage.getData().get("senderId"));
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, Intent.FILL_IN_ACTION);
+
+        Uri notificationUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(remoteMessage.getData().get("Username"))
+                .setContentText("Requests your location")
+                .setAutoCancel(true)
+                .setSound(notificationUri)
+                .setContentIntent(pendingIntent)
+                .addAction(R.drawable.ic_notifications_black_24dp, "Send location", pendingIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            notificationBuilder.setColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
+
+        notificationManager.notify(notificationID, notificationBuilder.build());
+
+    }
+
+    @Override
+    public void onNewToken(String s) {
+        super.onNewToken(s);
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth != null)
+        {
+            Log.d("NEW_TOKEN",s);
+        }
+    }
+
+    public void createLocationNotification(RemoteMessage remoteMessage){
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + remoteMessage.getData().get("Coordinates")));
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         int notificationID = new Random().nextInt(3000);
@@ -55,16 +111,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         notificationManager.notify(notificationID, notificationBuilder.build());
-    }
 
-    @Override
-    public void onNewToken(String s) {
-        super.onNewToken(s);
-        mAuth = FirebaseAuth.getInstance();
-        if (mAuth != null)
-        {
-            Log.d("NEW_TOKEN",s);
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

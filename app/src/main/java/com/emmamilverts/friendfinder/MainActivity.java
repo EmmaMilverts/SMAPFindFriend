@@ -1,11 +1,10 @@
 package com.emmamilverts.friendfinder;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
@@ -43,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationService mService;
     private boolean mBound = false;
+    FirebaseAuth mAuth;
+    DatabaseReference databaseCurrentUser;
+    private String selectedUsername;
+    DatabaseReference databaseFriendRequests;
+    FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
@@ -51,10 +55,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String friendUId = intent.getStringExtra("UserId");
+        mService.getLocation(friendUId);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         Intent serviceIntent = new Intent(this, LocationService.class);
         bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        mAuth.addAuthStateListener(mAuthListener);
     }
     @Override
     protected void onStop() {
@@ -80,11 +92,7 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference databaseFriendRequests;
     private String selectedUsername;
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
+    
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -115,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         Button btnSignOut = findViewById(R.id.btnSignOut);
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {

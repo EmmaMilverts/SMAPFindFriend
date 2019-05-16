@@ -15,12 +15,14 @@ import com.google.android.gms.location.LocationServices;
 
 public class LocationService extends Service {
     public static final String ACTION_GET_LOCATION = "ACTION_GET_LOCATION";
+    public static final String ACTION_REQUEST_LOCATION_PERMISSION = "ACTION_REQUEST_LOCATION_PERMISSION";
 
     public static final String RESULT_LOCATION_OBJECT = "RESULT_LOCATION_OBJECT";
-    public static final String ACTION_REQUEST_LOCATION_PERMISSION = "ACTION_REQUEST_LOCATION_PERMISSION";
+    public static final String RESULT_USER_ID = "RESULT_USER_ID";
 
     private final IBinder mBinder = new LocalBinder();
     private FusedLocationProviderClient fusedLocationClient;
+
 
     @Override
     public void onCreate() {
@@ -41,7 +43,8 @@ public class LocationService extends Service {
         return mBinder;
     }
 
-    public void getLocation() {
+    public void getLocation(String userId) {
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(ACTION_REQUEST_LOCATION_PERMISSION);
@@ -51,6 +54,7 @@ public class LocationService extends Service {
                 if (location != null) {
                     Intent intent = new Intent(ACTION_GET_LOCATION);
                     intent.putExtra(RESULT_LOCATION_OBJECT, location);
+                    intent.putExtra(RESULT_USER_ID, userId);
                     sendBroadcast(intent);
                 }
             });

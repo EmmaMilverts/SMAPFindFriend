@@ -21,9 +21,15 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
+import com.emmamilverts.friendfinder.DTO.LocationDTO;
 import com.emmamilverts.friendfinder.LocationService;
 import com.emmamilverts.friendfinder.MainActivity;
+import com.emmamilverts.friendfinder.MySingleton;
 import com.emmamilverts.friendfinder.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -32,8 +38,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class FriendListFragment extends Fragment {
@@ -44,9 +55,17 @@ public class FriendListFragment extends Fragment {
     DatabaseReference databaseUsernames;
     DatabaseReference databaseCurrentUser;
     DatabaseReference databaseFriendRequests;
+    DatabaseReference databaseUsers;
     FriendListAdapter listAdapter;
+    final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
+    final private String SERVER_KEY = "key=AAAA4mxHB-Y:APA91bHYQsp4uUj_6zHGj6fvqKP1OMSxkwco9tXs4gwx2aCp90ifJ7P6SEUqXIjC1XizR3JqNlluynATkYaS03ximFtn3Jg0h5VzKADb0i68pNoW3dXVh9FGm6xRpP5igjLUXDqoi-4H";
+    final private String CONTENT_TYPE = "application/json";
+    final String TAG = "NOTIFICATION_TAG";
 
     LocationService mService;
+    public static final String NOTIFICATION_TYPE_SEND_LOCATION = "NOTIFICATION_TYPE_SEND_LOCATION";
+    public static final String NOTIFICATION_TYPE_REQUEST_LOCATION = "NOTIFICATION_TYPE_REQUEST_LOCATION";
+
     public FriendListFragment() {
         friends = new ArrayList<FriendDTO>();
     }
@@ -65,6 +84,7 @@ public class FriendListFragment extends Fragment {
         databaseUsernames = FirebaseDatabase.getInstance().getReference().child("Usernames");
         databaseCurrentUser = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
         databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendsRequests");
+        databaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         setUpListeners();
         return view;
     }
@@ -135,7 +155,10 @@ public class FriendListFragment extends Fragment {
         public void onReceive(Context arg0, Intent arg1) {
                 Location locationObject = arg1.getParcelableExtra(LocationService.RESULT_LOCATION_OBJECT);
                 // TODO: 13-05-2019 Call Firebaseservice and send Location to user
+                String userId = arg1.getStringExtra(LocationService.RESULT_USER_ID);
                 Toast.makeText(getActivity(), "Location object fetched", Toast.LENGTH_LONG).show();
+
+            sendLocationNotification(userId, locationObject);
         }
     }
 
@@ -162,16 +185,132 @@ public class FriendListFragment extends Fragment {
                     databaseCurrentUser.child("Friends").child(friendDTO.userId).child("username").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            friendDTO.userName = dataSnapshot.getValue().toString();
-                            friends.add(friendDTO);
-                            listAdapter.notifyDataSetChanged();
-                        }
+                            List<String>namesInList = new ArrayList<>();
 
+                            for(FriendDTO friend: friends)
+                            {
+                                namesInList.add(friend.userName);
+                            }
+
+                            if(!namesInList.contains(dataSnapshot.getValue().toString()))
+                            {
+                                friendDTO.userName = dataSnapshot.getValue().toString();
+                                friends.add(friendDTO);
+                                listAdapter.notifyDataSetChanged();
+                            }
+                        }
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
 
                         }
                     });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void sendRequestNotification(String userId)
+    {
+        databaseCurrentUser.child("username").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String TOPIC = "/topics/"+ userId;
+                String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + " wants to see your location";
+                String NOTIFICATION_TITLE = "Location request";
+                JSONObject notification = new JSONObject();
+                JSONObject notificationBody = new JSONObject();
+                try {
+                    notificationBody.put("title", NOTIFICATION_TITLE);
+                    notificationBody.put("message", NOTIFICATION_MESSAGE);
+                    notificationBody.put("notificationType", NOTIFICATION_TYPE_REQUEST_LOCATION);
+                    notificationBody.put("senderId", mAuth.getUid());
+
+                    notification.put("to", TOPIC);
+                    notification.put("data", notificationBody);
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Toast.makeText(getContext(), "Notification sent!", Toast.LENGTH_SHORT).show();
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(getContext(), "Error requesting location", Toast.LENGTH_SHORT).show();
+                        }
+                    }){
+                        public Map<String, String> getHeaders()throws AuthFailureError {
+                            Map<String, String> parameters = new HashMap<>();
+                            parameters.put("Authorization", SERVER_KEY);
+                            parameters.put("Content-Type", CONTENT_TYPE);
+                            return parameters;
+                        }
+                    };
+
+                    MySingleton.getInstance(getContext().getApplicationContext()).addToRequestQueue(jsonObjectRequest);                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void sendLocationNotification(String userId, Location locationObject)
+    {
+        databaseCurrentUser.child("username").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String TOPIC = "/topics/"+ userId;
+                String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + "has sent you a location";
+                String NOTIFICATION_TITLE = "New location has arrived!";
+                JSONObject notification = new JSONObject();
+                JSONObject notificationBody = new JSONObject();
+                try {
+                    notificationBody.put("title", NOTIFICATION_TITLE);
+                    notificationBody.put("message", NOTIFICATION_MESSAGE);
+                    String coordinates = String.valueOf(String.valueOf(locationObject.getLatitude()+ "," + locationObject.getLongitude()));
+                    notificationBody.put("Coordinates",coordinates);
+                    notificationBody.put("notificationType", NOTIFICATION_TYPE_SEND_LOCATION);
+                    notificationBody.put("senderId", mAuth.getUid());
+
+
+                    notification.put("to", TOPIC);
+                    notification.put("data", notificationBody);
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Toast.makeText(getContext(), "Notification sent!", Toast.LENGTH_SHORT).show();
+                            LocationDTO locationDTO = new LocationDTO(coordinates, System.currentTimeMillis());
+                            databaseUsers.child(userId).child("Friends").child(mAuth.getUid()).child("Locations").setValue(locationDTO);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(getContext(), "Error sending notification", Toast.LENGTH_SHORT).show();
+                        }
+                    }){
+                        public Map<String, String> getHeaders()throws AuthFailureError {
+                            Map<String, String> parameters = new HashMap<>();
+                            parameters.put("Authorization", SERVER_KEY);
+                            parameters.put("Content-Type", CONTENT_TYPE);
+                            return parameters;
+                        }
+                    };
+
+                    MySingleton.getInstance(getContext().getApplicationContext()).addToRequestQueue(jsonObjectRequest);                }
+                catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
 

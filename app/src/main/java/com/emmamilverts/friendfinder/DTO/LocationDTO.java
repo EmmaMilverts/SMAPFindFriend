@@ -1,18 +1,15 @@
 package com.emmamilverts.friendfinder.DTO;
 
-import java.util.Date;
-
 public class LocationDTO {
     private String coordinates;
-    private Date timeStamp;
+    private Long timeStamp;
 
     public LocationDTO() {
     }
 
-    public LocationDTO(String coordinates, Date timeStamp, String place) {
+    public LocationDTO(String coordinates, Long timeStamp) {
         this.coordinates = coordinates;
         this.timeStamp = timeStamp;
-        this.place = place;
     }
 
     public String getCoordinates() {
@@ -23,11 +20,11 @@ public class LocationDTO {
         this.coordinates = coordinates;
     }
 
-    public Date getTimeStamp() {
+    public Long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Date timeStamp) {
+    public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
     }
 

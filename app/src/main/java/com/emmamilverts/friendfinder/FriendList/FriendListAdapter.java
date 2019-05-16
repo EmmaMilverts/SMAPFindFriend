@@ -9,39 +9,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
 import com.emmamilverts.friendfinder.LocationService;
-import com.emmamilverts.friendfinder.MySingleton;
 import com.emmamilverts.friendfinder.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FriendListAdapter extends RecyclerView.Adapter {
 
     FirebaseAuth mAuth;
     private String mCurrentId;
     DatabaseReference databaseUsers;
-    final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
-    final private String SERVER_KEY = "key=AAAA4mxHB-Y:APA91bHYQsp4uUj_6zHGj6fvqKP1OMSxkwco9tXs4gwx2aCp90ifJ7P6SEUqXIjC1XizR3JqNlluynATkYaS03ximFtn3Jg0h5VzKADb0i68pNoW3dXVh9FGm6xRpP5igjLUXDqoi-4H";
-    final private String CONTENT_TYPE = "application/json";
-    final String TAG = "NOTIFICATION_TAG";
+
 
 
     private List<FriendDTO> friendDTOList;
@@ -84,42 +67,12 @@ public class FriendListAdapter extends RecyclerView.Adapter {
             request_Button = itemView.findViewById(R.id.requestLocationButton);
 
             send_Button.setOnClickListener(v -> {
-                databaseUsers.child(mAuth.getUid()).child("username").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        String TOPIC = "/topics/"+ friendDTOList.get(getAdapterPosition()).userId;
-                        String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + "has sent you a location";
-                        String NOTIFICATION_TITLE = "New location has arrived!";
-                        JSONObject notification = new JSONObject();
-                        JSONObject notificationBody = new JSONObject();
-                        try {
-                            notificationBody.put("title", NOTIFICATION_TITLE);
-                            notificationBody.put("message", NOTIFICATION_MESSAGE);
-                            notificationBody.put("Coordinates","56.170785, 10.189453");
-
-                            notification.put("to", TOPIC);
-                            notification.put("data", notificationBody);
-
-                            sendNotification(notification);
-                        }
-                        catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-                // TODO: 09-05-2019 Should be able to send location to selected user
-               LocationService mService = fragment.getLocationService();
-               mService.getLocation();
+                LocationService mService = fragment.getLocationService();
+                mService.getLocation(friendDTOList.get(getAdapterPosition()).userId);
             });
 
             request_Button.setOnClickListener(v -> {
-                // TODO: 09-05-2019 Should be able to request location from selected user
-                LocationService mService = fragment.getLocationService();
+                fragment.sendRequestNotification(friendDTOList.get(getAdapterPosition()).userId);
             });
         }
 
@@ -128,32 +81,6 @@ public class FriendListAdapter extends RecyclerView.Adapter {
             userName_TextView.setText(friendDTOList.get(position).visibleName == null ? friendDTOList.get(position).userName : friendDTOList.get(position).visibleName );
         }
 
-        private void sendNotification(JSONObject notification)
-        {
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    Toast.makeText(context, "Notification sent!", Toast.LENGTH_SHORT).show();
-                    databaseUsers.child(friendDTOList.get(getAdapterPosition()).userId).child("Friends").child(mAuth.getUid()).child("Locations");
 
-
-
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(context, "Error sending notification", Toast.LENGTH_SHORT).show();
-                }
-            }){
-                public Map<String, String> getHeaders()throws AuthFailureError{
-                    Map<String, String> parameters = new HashMap<>();
-                    parameters.put("Authorization", SERVER_KEY);
-                    parameters.put("Content-Type", CONTENT_TYPE);
-                    return parameters;
-                }
-            };
-
-            MySingleton.getInstance(context.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
-        }
 }
 }
