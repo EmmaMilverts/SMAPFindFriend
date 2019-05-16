@@ -27,9 +27,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
 import com.emmamilverts.friendfinder.DTO.LocationDTO;
-import com.emmamilverts.friendfinder.LocationService;
-import com.emmamilverts.friendfinder.MainActivity;
-import com.emmamilverts.friendfinder.MySingleton;
+import com.emmamilverts.friendfinder.Services.LocationService;
+import com.emmamilverts.friendfinder.Activities.MainActivity;
+import com.emmamilverts.friendfinder.RequestQueueSingleton;
 import com.emmamilverts.friendfinder.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -146,7 +146,7 @@ public class FriendListFragment extends Fragment {
                     }
                     if (friendUId == null)
                     {
-                        Toast.makeText(mContext, "User does not exist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "UserDTO does not exist", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -275,7 +275,7 @@ public class FriendListFragment extends Fragment {
                         }
                     };
 
-                    MySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);                }
+                    RequestQueueSingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);                }
                 catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -333,7 +333,7 @@ public class FriendListFragment extends Fragment {
                         }
                     };
 
-                    MySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);                }
+                    RequestQueueSingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);                }
                 catch (JSONException e) {
                     e.printStackTrace();
                 }

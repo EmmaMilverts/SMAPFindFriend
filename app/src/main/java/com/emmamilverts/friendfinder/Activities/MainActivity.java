@@ -1,4 +1,4 @@
-package com.emmamilverts.friendfinder;
+package com.emmamilverts.friendfinder.Activities;
 
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -13,16 +13,22 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
+import com.emmamilverts.friendfinder.DTO.UserDTO;
 import com.emmamilverts.friendfinder.FriendList.FriendListFragment;
 import com.emmamilverts.friendfinder.FriendRequestList.FriendRequestListFragment;
 import com.emmamilverts.friendfinder.HistoryList.HistoryListFragment;
+import com.emmamilverts.friendfinder.R;
+import com.emmamilverts.friendfinder.Services.LocationService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -114,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         startService(new Intent(this,LocationService.class));
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         if (savedInstanceState != null){
             if(savedInstanceState.getBoolean("chooseUserNameState")) {
                 chooseUserName();
@@ -203,12 +211,12 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
         String userEmail = firebaseUser.getEmail();
 
-        User user = new User(selectedUsername, Friends, userEmail);
+        UserDTO userDTO = new UserDTO(selectedUsername, Friends, userEmail);
 
-        databaseCurrentUser.setValue(user);
+        databaseCurrentUser.setValue(userDTO);
         databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendRequests").child(mAuth.getUid());
 
-        Toast.makeText(this, "User added", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "UserDTO added", Toast.LENGTH_SHORT).show();
     }
 
     private void chooseUserName()
@@ -251,5 +259,23 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean showDialogState() {
         return showAddFriendDialog;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_favorite)
+        {
+            Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

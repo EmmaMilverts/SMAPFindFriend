@@ -1,4 +1,4 @@
-package com.emmamilverts.friendfinder;
+package com.emmamilverts.friendfinder.Services;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,9 +11,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
+import com.emmamilverts.friendfinder.Activities.MainActivity;
 import com.emmamilverts.friendfinder.FriendList.FriendListFragment;
+import com.emmamilverts.friendfinder.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -70,17 +71,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         notificationManager.notify(notificationID, notificationBuilder.build());
 
-    }
-
-    @Override
-    public void onNewToken(String s) {
-        super.onNewToken(s);
-        mAuth = FirebaseAuth.getInstance();
-
-        if (mAuth != null)
-        {
-            Log.d("NEW_TOKEN",s);
-        }
     }
 
     public void createLocationNotification(RemoteMessage remoteMessage){

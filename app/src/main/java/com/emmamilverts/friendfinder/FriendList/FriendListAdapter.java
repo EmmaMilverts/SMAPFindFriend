@@ -7,11 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
-import com.emmamilverts.friendfinder.LocationService;
+import com.emmamilverts.friendfinder.Services.LocationService;
 import com.emmamilverts.friendfinder.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -55,13 +54,11 @@ public class FriendListAdapter extends RecyclerView.Adapter {
         return friendDTOList.size();
     }
     private class ListViewholder extends RecyclerView.ViewHolder {
-        ImageView profile_ImageView;
         TextView userName_TextView;
         Button send_Button;
         Button request_Button;
         public ListViewholder(@NonNull View itemView) {
             super(itemView);
-            profile_ImageView = itemView.findViewById(R.id.user_imageView);
             userName_TextView = itemView.findViewById(R.id.userName_textView);
             send_Button  = itemView.findViewById(R.id.sendLocationButton);
             request_Button = itemView.findViewById(R.id.requestLocationButton);

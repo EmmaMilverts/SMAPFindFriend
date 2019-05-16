@@ -1,27 +1,25 @@
-package com.emmamilverts.friendfinder;
-
-import com.emmamilverts.friendfinder.DTO.FriendDTO;
+package com.emmamilverts.friendfinder.DTO;
 
 import java.util.List;
 
-public class User {
+public class UserDTO {
     String username;
     List<FriendDTO> friends;
     String email;
 
-    public User()
+    public UserDTO()
     {
 
     }
 
-    public User(String userName, List<FriendDTO>friends, String email)
+    public UserDTO(String userName, List<FriendDTO>friends, String email)
     {
         this.username = userName;
         this.friends = friends;
         this.email = email;
     }
 
-    public User(String userName, String email)
+    public UserDTO(String userName, String email)
     {
         this.username = userName;
         this.email = email;
@@ -39,7 +37,7 @@ public class User {
         return userName;
     }
 
-    public List<User> setFriends(List<User> friends)
+    public List<UserDTO> setFriends(List<UserDTO> friends)
     {
         return friends;
     }

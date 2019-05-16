@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emmamilverts.friendfinder.DTO.HistoryDTO;
@@ -41,7 +40,6 @@ public class HistoryListAdapter extends RecyclerView.Adapter {
         return historyList.size();
     }
     private class ListViewholder extends RecyclerView.ViewHolder {
-        public ImageView profile_ImageView;
         public TextView userName_TextView;
         public TextView location_TextView;
         public TextView updateTime_TextView;
@@ -49,7 +47,6 @@ public class HistoryListAdapter extends RecyclerView.Adapter {
 
         public ListViewholder(@NonNull View itemView) {
             super(itemView);
-            profile_ImageView = itemView.findViewById(R.id.user_imageView);
             userName_TextView = itemView.findViewById(R.id.userName_textView);
             location_TextView = itemView.findViewById(R.id.location_TextView);
             updateTime_TextView = itemView.findViewById(R.id.updateTime_TextView);

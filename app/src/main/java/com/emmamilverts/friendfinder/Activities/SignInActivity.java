@@ -1,4 +1,4 @@
-package com.emmamilverts.friendfinder;
+package com.emmamilverts.friendfinder.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,9 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.emmamilverts.friendfinder.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -40,7 +40,7 @@ public class SignInActivity extends AppCompatActivity {
     private String mCurrentId;
     DatabaseReference databaseUsers;
 
-    SignInButton button;
+    SignInButton btnSignInGoogle;
     private final static int RC_SIGN_IN = 123;
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth.AuthStateListener mAuthListner;
@@ -67,20 +67,20 @@ public class SignInActivity extends AppCompatActivity {
 
         inputEmail = findViewById(R.id.email);
         inputPassword = findViewById(R.id.password);
-        Button ahlogin = findViewById(R.id.ah_login);
+        Button signInLogin = findViewById(R.id.sign_in_button);
         progressBar = findViewById(R.id.progressBar);
-        final TextView btnSignIn = findViewById(R.id.sign_in_button);
-        button = findViewById(R.id.sign_in_google);
+        Button signUpLogin = findViewById(R.id.sign_up_button);
+        btnSignInGoogle = findViewById(R.id.sign_in_google);
 
 
-        button.setOnClickListener(new View.OnClickListener() {
+        btnSignInGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signIn();
             }
         });
 
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
+        signUpLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(SignInActivity.this, SignUpActivity.class));
@@ -89,8 +89,8 @@ public class SignInActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        //Checking the email id and password is empty
-        ahlogin.setOnClickListener(new View.OnClickListener() {
+        //Checking if the email id and password is empty
+        signInLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = inputEmail.getText().toString();
@@ -151,11 +151,9 @@ public class SignInActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                //Google sign in was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                //Google sign in failed, update UI
                 Log.w("TAG", "Google sign in failed", e);
             }
         }
@@ -167,7 +165,6 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    //Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithCredential:success");
                 }
                 else {

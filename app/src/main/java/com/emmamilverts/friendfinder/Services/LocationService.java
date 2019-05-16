@@ -1,4 +1,4 @@
-package com.emmamilverts.friendfinder;
+package com.emmamilverts.friendfinder.Services;
 
 import android.Manifest;
 import android.app.Service;
@@ -31,7 +31,7 @@ public class LocationService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        LocationService getService() {
+        public LocationService getService() {
             // Return object that can call public methods
             return LocationService.this;
         }
