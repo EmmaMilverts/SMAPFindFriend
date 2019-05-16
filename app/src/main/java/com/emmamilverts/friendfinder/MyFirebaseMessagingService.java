@@ -76,6 +76,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(String s) {
         super.onNewToken(s);
         mAuth = FirebaseAuth.getInstance();
+
         if (mAuth != null)
         {
             Log.d("NEW_TOKEN",s);

@@ -62,6 +62,7 @@ public class FriendListFragment extends Fragment {
     final private String SERVER_KEY = "key=AAAA4mxHB-Y:APA91bHYQsp4uUj_6zHGj6fvqKP1OMSxkwco9tXs4gwx2aCp90ifJ7P6SEUqXIjC1XizR3JqNlluynATkYaS03ximFtn3Jg0h5VzKADb0i68pNoW3dXVh9FGm6xRpP5igjLUXDqoi-4H";
     final private String CONTENT_TYPE = "application/json";
     final String TAG = "NOTIFICATION_TAG";
+    private boolean ADDING_FRIEND_DIALOG_ACTIVE;
 
     LocationService mService;
     public static final String NOTIFICATION_TYPE_SEND_LOCATION = "NOTIFICATION_TYPE_SEND_LOCATION";
@@ -81,12 +82,14 @@ public class FriendListFragment extends Fragment {
         FloatingActionButton add_Button = view.findViewById(R.id.add_FAB);
         add_Button.setOnClickListener(v -> openAddFriendDialog());
         mAuth = FirebaseAuth.getInstance();
-        mCurrentId = FirebaseAuth.getInstance().getUid();
-        databaseUsernames = FirebaseDatabase.getInstance().getReference().child("Usernames");
-        databaseCurrentUser = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
-        databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendsRequests");
-        databaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
-        setUpListeners();
+        if (mAuth.getUid() != null) {
+            mCurrentId = FirebaseAuth.getInstance().getUid();
+            databaseUsernames = FirebaseDatabase.getInstance().getReference().child("Usernames");
+            databaseCurrentUser = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
+            databaseFriendRequests = FirebaseDatabase.getInstance().getReference().child("FriendsRequests");
+            databaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
+            setUpListeners();
+        }
         return view;
     }
 
@@ -94,10 +97,18 @@ public class FriendListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        MainActivity main = (MainActivity) getActivity();
+        assert main != null;
+        if(main.showDialogState()) {
+            openAddFriendDialog();
+        }
     }
 
     // SOURCE: https://stackoverflow.com/questions/10903754/input-text-dialog-android
     private void openAddFriendDialog(){
+        MainActivity main = (MainActivity) getActivity();
+        main.setDialogState(true);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Type user name");
 
@@ -119,6 +130,8 @@ public class FriendListFragment extends Fragment {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 databaseFriendRequests.child(friendUId).child(mAuth.getUid()).setValue(dataSnapshot.getValue().toString());
+                                main.setDialogState(false);
+
                             }
 
                             @Override
@@ -143,7 +156,10 @@ public class FriendListFragment extends Fragment {
                 }
             });
         });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            dialog.cancel();
+            main.setDialogState(false);
+        } );
         builder.show();
     }
 

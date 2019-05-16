@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -16,10 +15,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.emmamilverts.friendfinder.DTO.FriendDTO;
@@ -47,12 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private String selectedUsername;
     DatabaseReference databaseFriendRequests;
     FirebaseAuth.AuthStateListener mAuthListener;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
-        startService(new Intent(this,LocationService.class));
-    }
+    String activeFragmentName;
+    private boolean showAddFriendDialog;
+    private boolean chooseUserNameState;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -84,13 +78,6 @@ public class MainActivity extends AppCompatActivity {
             mService = binder.getService();
             mBound = true;
         }
-    private TextView mTextMessage;
-    FirebaseAuth mAuth;
-    FirebaseAuth.AuthStateListener mAuthListener;
-
-    DatabaseReference databaseCurrentUser;
-    DatabaseReference databaseFriendRequests;
-    private String selectedUsername;
 
     
 
@@ -107,12 +94,15 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     fragment = new FriendListFragment();
+                    activeFragmentName = "FriendListFragment";
                     break;
                 case R.id.navigation_dashboard:
                     fragment = new HistoryListFragment();
+                    activeFragmentName = "HistoryListFragment";
                     break;
                 case R.id.navigation_notifications:
                     fragment = new FriendRequestListFragment();
+                    activeFragmentName = "FriendRequestListFragment";
                     break;
             }
             return loadFragment(fragment);
@@ -123,9 +113,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        startService(new Intent(this,LocationService.class));
+        if (savedInstanceState != null){
+            if(savedInstanceState.getBoolean("chooseUserNameState")) {
+                chooseUserName();
+            };
+        }
         Button btnSignOut = findViewById(R.id.btnSignOut);
+        btnSignOut.setOnClickListener(v -> mAuth.signOut());
+        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -136,13 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAuth.signOut();
-            }
-        });
         if (mAuth.getCurrentUser() != null) {
             databaseCurrentUser = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid());
 
@@ -152,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                     Object userNameObject = dataSnapshot.getValue();
                     if (userNameObject == null)
                     {
-                        firstTimeLogin();
+                        chooseUserName();
                     }
                 }
 
@@ -161,21 +151,33 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-            loadFragment(new FriendListFragment());
             FirebaseMessaging.getInstance().subscribeToTopic(mAuth.getUid());
         }
 
-
-
-
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        if (savedInstanceState != null){
+            String fragmentName = savedInstanceState.getString("ActiveFragmentName");
+            showAddFriendDialog = savedInstanceState.getBoolean("ShowAddFriendDialog");
+            switch (fragmentName) {
+                case "FriendListFragment":
+                    loadFragment(new FriendListFragment());
+                    activeFragmentName = "FriendListFragment";
+                    break;
+                case "HistoryListFragment":
+                    loadFragment(new HistoryListFragment());
+                    activeFragmentName = "HistoryListFragment";
+                    break;
+                case "FriendRequestListFragment":
+                    loadFragment(new FriendRequestListFragment());
+                    activeFragmentName = "FriendRequestListFragment";
+                    break;
+            }
+        }
+        else {
+            activeFragmentName = "FriendListFragment";
+            loadFragment(new FriendListFragment());
+        }
     }
 
-    private void firstTimeLogin()
-    {
-        chooseUserName();
-    }
     private boolean loadFragment(Fragment fragment) {
         //switching fragment
         if (fragment != null) {
@@ -211,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void chooseUserName()
     {
+        chooseUserNameState = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Please choose a username");
 
@@ -227,9 +230,26 @@ public class MainActivity extends AppCompatActivity {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Usernames").child(selectedUsername);
             ref.setValue(id);
             AddUserToFirebaseDB();
+            chooseUserNameState = false;
         });
 
         builder.setCancelable(false);
         builder.show();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("ActiveFragmentName",activeFragmentName);
+        outState.putBoolean("ShowAddFriendDialog", showAddFriendDialog);
+        outState.putBoolean("chooseUserNameState", chooseUserNameState);
+    }
+
+    public void setDialogState(boolean bool){
+        showAddFriendDialog = bool;
+    }
+
+    public boolean showDialogState() {
+        return showAddFriendDialog;
     }
 }
