@@ -228,7 +228,7 @@ public class FriendListFragment extends Fragment {
                     notificationBody.put("title", NOTIFICATION_TITLE);
                     notificationBody.put("message", NOTIFICATION_MESSAGE);
                     notificationBody.put("notificationType", NOTIFICATION_TYPE_REQUEST_LOCATION);
-                    notificationBody.put("senderId", mAuth.getUid());
+                    notificationBody.put("senderid", mAuth.getUid());
 
                     notification.put("to", TOPIC);
                     notification.put("data", notificationBody);

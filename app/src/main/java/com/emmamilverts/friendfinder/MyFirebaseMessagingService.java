@@ -49,9 +49,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             setupChannels(notificationManager);
         }
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        Object test = remoteMessage.getData();
-        notificationIntent.putExtra("UserId", remoteMessage.getData().get("senderId"));
+        String senderId = remoteMessage.getData().get("senderid");
+        Intent notificationIntent = new Intent(this, MainActivity.class).setAction(senderId);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, Intent.FILL_IN_ACTION);
 
         Uri notificationUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
