@@ -222,6 +222,7 @@ public class FriendListFragment extends Fragment {
                 String TOPIC = "/topics/"+ userId;
                 String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + " wants to see your location";
                 String NOTIFICATION_TITLE = "Location request";
+                String username = dataSnapshot.getValue().toString();
                 JSONObject notification = new JSONObject();
                 JSONObject notificationBody = new JSONObject();
                 try {
@@ -229,6 +230,7 @@ public class FriendListFragment extends Fragment {
                     notificationBody.put("message", NOTIFICATION_MESSAGE);
                     notificationBody.put("notificationType", NOTIFICATION_TYPE_REQUEST_LOCATION);
                     notificationBody.put("senderid", mAuth.getUid());
+                    notificationBody.put("username", username);
 
                     notification.put("to", TOPIC);
                     notification.put("data", notificationBody);
@@ -273,6 +275,7 @@ public class FriendListFragment extends Fragment {
                 String TOPIC = "/topics/"+ userId;
                 String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + "has sent you a location";
                 String NOTIFICATION_TITLE = "New location has arrived!";
+                String username = dataSnapshot.getValue().toString();
                 JSONObject notification = new JSONObject();
                 JSONObject notificationBody = new JSONObject();
                 try {
@@ -281,7 +284,8 @@ public class FriendListFragment extends Fragment {
                     String coordinates = String.valueOf(String.valueOf(locationObject.getLatitude()+ "," + locationObject.getLongitude()));
                     notificationBody.put("Coordinates",coordinates);
                     notificationBody.put("notificationType", NOTIFICATION_TYPE_SEND_LOCATION);
-                    notificationBody.put("senderId", mAuth.getUid());
+                    notificationBody.put("senderid", mAuth.getUid());
+                    notificationBody.put("username", username);
 
 
                     notification.put("to", TOPIC);

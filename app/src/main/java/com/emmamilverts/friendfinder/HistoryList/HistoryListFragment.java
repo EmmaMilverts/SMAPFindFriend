@@ -52,14 +52,17 @@ public class HistoryListFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot friend : dataSnapshot.getChildren()) {
                     String friendUsername = friend.child("username").getValue().toString();
-                    String friendCoordinates = friend.child("Locations").child("coordinates").getValue().toString();
-                    Long friendTimeStamp = (long) friend.child("Locations").child("timeStamp").getValue();
-                    HistoryDTO historyDTO = new HistoryDTO();
-                    historyDTO.username = friendUsername;
-                    historyDTO.coordinates = friendCoordinates;
-                    historyDTO.timeStamp = friendTimeStamp;
-                    historyList.add(historyDTO);
-                    listAdapter.notifyDataSetChanged();
+                    if(friend.child("Locations").child("coordinates").getValue() != null)
+                    {
+                        String friendCoordinates = friend.child("Locations").child("coordinates").getValue().toString();
+                        Long friendTimeStamp = (long) friend.child("Locations").child("timeStamp").getValue();
+                        HistoryDTO historyDTO = new HistoryDTO();
+                        historyDTO.username = friendUsername;
+                        historyDTO.coordinates = friendCoordinates;
+                        historyDTO.timeStamp = friendTimeStamp;
+                        historyList.add(historyDTO);
+                        listAdapter.notifyDataSetChanged();
+                    }
                 }
             }
 
