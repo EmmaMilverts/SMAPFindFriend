@@ -58,7 +58,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String friendUId = intent.getAction();
-        mService.getLocation(friendUId);
+        if (friendUId != null)
+        {
+            mService.getLocation(friendUId);
+        }
     }
 
     @Override
