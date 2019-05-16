@@ -133,17 +133,17 @@ public class FriendListFragment extends Fragment {
                     }
                     if (friendUId.equals(mAuth.getUid()))
                     {
-                        Toast.makeText(mContext, getString(R.string.You_cannot_add_yourself_as_a_friend), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.You_cannot_add_yourself_as_a_friend), Toast.LENGTH_SHORT).show();
                     }
                     if (friendUId == null)
                     {
-                        Toast.makeText(mContext, getString(R.string.User_doesnt_exist), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.User_doesnt_exist), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(mContext, getString(R.string.Database_error), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.Database_error), Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -232,8 +232,8 @@ public class FriendListFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String TOPIC = "/topics/"+ userId;
-                String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + getString(R.string.wants_to_see_your_location);
-                String NOTIFICATION_TITLE = getString(R.string.Location_request);
+                String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + mContext.getString(R.string.wants_to_see_your_location);
+                String NOTIFICATION_TITLE = mContext.getString(R.string.Location_request);
                 String username = dataSnapshot.getValue().toString();
                 JSONObject notification = new JSONObject();
                 JSONObject notificationBody = new JSONObject();
@@ -248,8 +248,8 @@ public class FriendListFragment extends Fragment {
                     notification.put("data", notificationBody);
 
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
-                            response -> Toast.makeText(mContext, getString(R.string.notification_sent), Toast.LENGTH_SHORT).show(),
-                            error -> Toast.makeText(mContext, getString(R.string.Error_sending_notification), Toast.LENGTH_SHORT).show())
+                            response -> Toast.makeText(mContext, mContext.getString(R.string.notification_sent), Toast.LENGTH_SHORT).show(),
+                            error -> Toast.makeText(mContext, mContext.getString(R.string.Error_sending_notification), Toast.LENGTH_SHORT).show())
                     {
                         public Map<String, String> getHeaders() {
                             Map<String, String> parameters = new HashMap<>();
@@ -278,8 +278,8 @@ public class FriendListFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String TOPIC = "/topics/"+ userId;
-                String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + getString(R.string.has_sent_you_a_location);
-                String NOTIFICATION_TITLE = getString(R.string.new_location_has_arrived);
+                String NOTIFICATION_MESSAGE = dataSnapshot.getValue().toString() + mContext.getString(R.string.has_sent_you_a_location);
+                String NOTIFICATION_TITLE = mContext.getString(R.string.new_location_has_arrived);
                 String username = dataSnapshot.getValue().toString();
                 JSONObject notification = new JSONObject();
                 JSONObject notificationBody = new JSONObject();
@@ -298,11 +298,11 @@ public class FriendListFragment extends Fragment {
 
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
                             response -> {
-                        Toast.makeText(mContext, getString(R.string.notification_sent), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.notification_sent), Toast.LENGTH_SHORT).show();
                         LocationDTO locationDTO = new LocationDTO(coordinates, System.currentTimeMillis());
                         databaseUsers.child(userId).child("Friends").child(mAuth.getUid()).child("Locations").setValue(locationDTO);
                         },
-                            error -> Toast.makeText(mContext, getString(R.string.Error_sending_notification), Toast.LENGTH_SHORT).show()){
+                            error -> Toast.makeText(mContext, mContext.getString(R.string.Error_sending_notification), Toast.LENGTH_SHORT).show()){
                         public Map<String, String> getHeaders() {
                             Map<String, String> parameters = new HashMap<>();
                             parameters.put("Authorization", SERVER_KEY);
