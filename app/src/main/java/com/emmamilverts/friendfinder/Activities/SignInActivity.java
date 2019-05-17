@@ -28,7 +28,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-
+//SOURCE: https://www.androidhire.com/google-login-and-registration-for-android-using-firebase/
+//https://firebase.google.com/docs/auth/android/google-signin?utm_source=studio
 public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "LOG TAG";
@@ -63,7 +64,7 @@ public class SignInActivity extends AppCompatActivity {
 
         inputEmail = findViewById(R.id.email);
         inputPassword = findViewById(R.id.password);
-        Button signInLogin = findViewById(R.id.sign_in_button);
+        Button regularSignInButton = findViewById(R.id.sign_in_button);
         progressBar = findViewById(R.id.progressBar);
         Button signUpLogin = findViewById(R.id.sign_up_button);
         btnSignInGoogle = findViewById(R.id.sign_in_google);
@@ -72,14 +73,14 @@ public class SignInActivity extends AppCompatActivity {
             inputEmail.setText(savedInstanceState.getString("EMAIL"));
             inputPassword.setText(savedInstanceState.getString("PASSWORD"));
         }
-        btnSignInGoogle.setOnClickListener(v -> signIn());
+        btnSignInGoogle.setOnClickListener(v -> signInWithGoogle());
 
         signUpLogin.setOnClickListener(v -> startActivity(new Intent(SignInActivity.this, SignUpActivity.class)));
 
         mAuth = FirebaseAuth.getInstance();
 
         //Checking if the email id and password is empty
-        signInLogin.setOnClickListener(v -> {
+        regularSignInButton.setOnClickListener(v -> {
             String email = inputEmail.getText().toString();
             final String password = inputPassword.getText().toString();
             if (TextUtils.isEmpty(email)) {
@@ -122,7 +123,7 @@ public class SignInActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
-    private void signIn() {
+    private void signInWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }

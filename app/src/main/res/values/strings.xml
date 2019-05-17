@@ -43,4 +43,5 @@
     <string name="Requests_your_location_notifcation">Requests your location</string>
     <string name="click_here_to_see_the_location_notification">Click here to see the location</string>
     <string name="First_time_setup_Press_button_again">First time setup - press button again</string>
+    <string name="Google_Maps_URL"><![CDATA[https://www.google.com/maps/search/?api=1&query=]]></string>
 </resources>

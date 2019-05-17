@@ -5,7 +5,7 @@ import android.content.Context;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-
+//SOURCE: https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143?fbclid=IwAR2Qz-1oUwqfbg9P_NAWzJk2oRaSfkrH2QfAgl_l8WEYX_s2DkwXg5uYLzA
 public class RequestQueueSingleton {
     private static RequestQueueSingleton instance;
     private RequestQueue requestQueue;

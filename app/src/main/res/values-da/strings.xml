@@ -39,4 +39,5 @@
     <string name="send_location">Send lokalitet</string>
     <string name="request">Anmod</string>
     <string name="First_time_setup_Press_button_again">Førstegangsopsætning - tryk på knappen igen</string>
+    <string name="Google_Maps_URL"><![CDATA[https://www.google.com/maps/search/?api=1&query=]]></string>
 </resources>

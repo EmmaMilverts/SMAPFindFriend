@@ -104,15 +104,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
+                case R.id.navigation_FriendList:
                     fragment = new FriendListFragment();
                     activeFragmentName = "FriendListFragment";
                     break;
-                case R.id.navigation_dashboard:
+                case R.id.navigation_HistoryList:
                     fragment = new HistoryListFragment();
                     activeFragmentName = "HistoryListFragment";
                     break;
-                case R.id.navigation_notifications:
+                case R.id.navigation_FriendRequestList:
                     fragment = new FriendRequestListFragment();
                     activeFragmentName = "FriendRequestListFragment";
                     break;
@@ -139,12 +139,15 @@ public class MainActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                //If user isn't signed in user will redirected to SignInActivity
                 if (firebaseAuth.getCurrentUser() == null)
                 {
                     startActivity(new Intent(MainActivity.this, SignInActivity.class));
                 }
             }
         };
+        //SOURCE: used in general for all firebase database communication
+        //https://firebase.google.com/docs/database/admin/retrieve-data?fbclid=IwAR2ZcydxKfhFaxZtm9O9YzM6mDR8vSOwWu1mjFyL-wSvXoAuJQrcVQQFvew
         if (mAuth.getCurrentUser() != null) {
             databaseCurrentUser = FirebaseDatabase.getInstance().getReference().child("Users").child(Objects.requireNonNull(mAuth.getUid()));
 
@@ -163,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+            //User is listening for notifications
             FirebaseMessaging.getInstance().subscribeToTopic(mAuth.getUid());
         }
 

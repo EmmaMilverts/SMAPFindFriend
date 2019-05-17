@@ -99,17 +99,6 @@ public class FriendListFragment extends Fragment {
         if(main.showDialogState()) {
             openAddFriendDialog();
         }
-        //Objects.requireNonNull(getActivity()).registerReceiver(locationReceiver, new IntentFilter(LocationService.ACTION_GET_LOCATION));
-        //Objects.requireNonNull(getActivity()).registerReceiver(permissionReceiver,new IntentFilter(LocationService.ACTION_REQUEST_LOCATION_PERMISSION));
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        /*
-        Objects.requireNonNull(getActivity()).unregisterReceiver(locationReceiver);
-        Objects.requireNonNull(getActivity()).unregisterReceiver(permissionReceiver);
-        */
     }
 
     // SOURCE: https://stackoverflow.com/questions/10903754/input-text-dialog-android
@@ -252,7 +241,8 @@ public class FriendListFragment extends Fragment {
             }
         });
     }
-
+    //This source was used for building notifications
+    //https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143?fbclid=IwAR2Qz-1oUwqfbg9P_NAWzJk2oRaSfkrH2QfAgl_l8WEYX_s2DkwXg5uYLzA
     public void sendRequestNotification(String userId)
     {
         databaseCurrentUser.child("username").addListenerForSingleValueEvent(new ValueEventListener() {

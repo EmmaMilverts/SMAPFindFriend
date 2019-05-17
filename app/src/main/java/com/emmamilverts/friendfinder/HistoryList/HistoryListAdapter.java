@@ -55,7 +55,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter {
             itemView.setOnClickListener(v -> {
                 HistoryDTO clickedItem = historyList.get(getAdapterPosition());
                 String encodedSearchString = GoogleMapsEncode.encodeString(clickedItem.coordinates);
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + encodedSearchString));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.Google_Maps_URL) + encodedSearchString));
                 context.startActivity(browserIntent);
             });
         }

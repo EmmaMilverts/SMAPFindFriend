@@ -50,7 +50,7 @@ public class LocationService extends Service {
     }
 
     public void getLocation(String userId) {
-
+        //SOURCE: https://stackoverflow.com/questions/32491960/android-check-permission-for-locationmanager?fbclid=IwAR1qu0m_0c8T1eK4cs8Nhhg-muThu2GG_qOvQbt9B2uuUW80n6pDfKJF2tg
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(ACTION_REQUEST_LOCATION_PERMISSION);

@@ -19,7 +19,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Random;
-
+//SOURCE: https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143?fbclid=IwAR2Qz-1oUwqfbg9P_NAWzJk2oRaSfkrH2QfAgl_l8WEYX_s2DkwXg5uYLzA
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private final String ADMIN_CHANNEL_ID = "admin_channel";
 
@@ -71,7 +71,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     public void createLocationNotification(RemoteMessage remoteMessage){
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + remoteMessage.getData().get("Coordinates")));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Google_Maps_URL) + remoteMessage.getData().get("Coordinates")));
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         int notificationID = new Random().nextInt(3000);
 
