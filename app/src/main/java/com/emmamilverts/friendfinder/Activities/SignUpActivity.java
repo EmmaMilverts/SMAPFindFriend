@@ -41,13 +41,15 @@ public class SignUpActivity extends AppCompatActivity {
         email_id = findViewById(R.id.input_email);
         progressBar = findViewById(R.id.progressBar);
         password_check = findViewById(R.id.input_password);
-        Button ahSignUp = findViewById(R.id.btn_signup);
+        Button SignUpButton = findViewById(R.id.btn_signup);
 
         if (savedInstanceState != null) {
             email_id.setText(savedInstanceState.getString("EMAIL"));
             password_check.setText(savedInstanceState.getString("PASSWORD"));
         }
-        ahSignUp.setOnClickListener(v -> {
+
+        //Registering af user using data from text fields.
+        SignUpButton.setOnClickListener(v -> {
             String email = email_id.getText().toString();
             String password = password_check.getText().toString();
 
